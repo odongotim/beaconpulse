@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forms</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+   <div class="form-wrapper">
+    <a href="index.html" class="back-link">← Back to Dashboard</a>
+
+    <div class="form-container">
+        <div class="form-header">
+            <h2>The Beacon <span>Pulse</span> Desk</h2>
+            <p>Illuminating Minds, Documenting Life.</p>
+        </div>
+        
+        <form action="https://formspree.io/f/xwvnblyr" method="POST" enctype="multipart/form-data">
+            <label>Your Name/Alias:</label>
+            <input type="text" name="name" placeholder="Who is reporting?" required>
+
+            <label>Phone Number (for verification):</label>
+            <input type="tel" name="phone" placeholder="e.g. 07..., 03..., 0r 02..." required>
+
+            <label>Category:</label>
+            <select name="category">
+                <option value="breaking">Breaking News</option>
+                <option value="sports">Sports Result</option>
+                <option value="documentary">Photo/Video for Documentary</option>
+                <option value="opinion">The Podium (Opinion)</option>
+            </select>
+
+            <label>Your Message:</label>
+            <textarea name="message" rows="4" required placeholder="Tell us what happened..." required></textarea>
+
+            <button type="submit" class="btn-send">Broadcast Tip</button>
+        </form>
+    </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

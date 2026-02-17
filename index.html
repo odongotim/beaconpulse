@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Beacon Pulse</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="brand">
+            <h1 class="logo">The Beacon <span>Pulse</span></h1>
+            <p class="tagline">Illuminating Minds, Documenting Life.</p>
+        </div>
+
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <ul class="nav-links" id="nav-links">
+            <li><a href="#all">All</a></li>
+            <li><a href="#illumination">Illumination</a></li>
+            <li><a href="#jobs">Jobs</a></li>
+            <li><a href="#events">Events</a></li>
+            <li><a href="#sports">Sports</a></li>
+            <li><a href="submit.html" class="btn-submit">Submit Tip</a></li>
+        </ul>
+    </nav>
+    <section class="search-section">
+        <input type="text" placeholder="Search announcements...">
+        <button id="searchBtn">Search</button>
+    </section>
+    <section class="alert"
+    data-time="2026-02-17T10:00:00"
+    data-title="Suspicious activity reported near the main gate"
+    data-description="Campus Security has received reports of suspicious activity occurring near the Main Gate over the last 48 hours. While authorities are monitoring the situation, all students and staff are advised to remain vigilant, especially when entering or exiting the premises during late hours."
+    data-image="gate.jfif">
+        <h2>⚠ High Risk Alert</h2>
+        <p>Suspicious activity reported near the main gate. Stay alert.</p>
+        <small class="alert-time"></small>
+    </section>
+
+    <section class="news-container">
+
+        <div class="news-card" data-time="2026-02-17T10:00:00"
+        data-title="Internship Opportunity at Tech Hub"
+        data-description="Tech Hub is accepting software development interns. Applicants must know HTML, CSS, and JavaScript. Deadline is 28th February. Apply via the university career office."
+        data-video="new.mp4"
+        data-category="Jobs">
+            <img src="internship.jfif" alt="internship.jpg" class="news-img">
+            <h3>Internship Opportunity at Tech Hub</h3>
+            <p>Applications are open for software development interns.</p>
+            <span class="category">Jobs</span>
+            <small class="time"></small>
+        </div>
+
+        <div class="news-card" data-time="2026-02-15T10:00:00"
+        data-title="Exame Timetable Released"
+        data-description="<p>The academic schedule for Semester Two has been finalized and released. Students are encouraged to review their course timings immediately to avoid scheduling conflicts with extracurricular sessions or lab work.</p><a href='Timetable.pdf' download class='download-btn'>
+            Download Timetable (PDF)
+        </a></div>"
+        data-image="table.webp"
+        data-category="Illumination">
+            <img src="images/table.webp" alt="" class="news-img">
+            <h3>Exam Timetable Released</h3>
+            <p>The semester examination timetable has been uploaded.</p>
+            <span class="category">Illumination</span>
+            <small class="time"></small>
+        </div>
+
+        <div class="news-card" data-time="2026-02-17T10:00:00"
+        data-title="Innovattion Meeting this Friday"
+        data-description="Join us for a late-night collaborative session focused on the intersection of healthcare and modern innovation. Whether you're a designer, researcher, or just curious about the next big breakthrough, your perspective is needed."
+        data-image="meet.webp"
+        data-category="Events">
+            <img src="meet.webp" alt="" class="news-img">
+            <h3>Innovation Meeting This Friday</h3>
+            <p>All members are invited to the innovation planning meeting.</p>
+            <span class="category">Events</span>
+            <small class="time"></small>
+        </div>
+
+    </section>
+
+<div id="newsModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="modalTitle"></h2>
+        <img id="modalImage" style="display:none; max-width:100%;">
+        <div id="modalDescription"></div>
+        <video id="modalVideo"
+               controls
+               style="display:none; width:100%; margin-top:10px;">
+        </video>
+    </div>
+</div>
+<script src="script.js"></script>
+</div>
+</body>
+</html>

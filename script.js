@@ -1,0 +1,165 @@
+document.addEventListener("DOMContentLoaded", () => {
+
+    // ---------------- Hamburger Menu ----------------
+    const hamburger = document.getElementById("hamburger");
+    const navLinksContainer = document.getElementById("nav-links");
+
+    if (hamburger && navLinksContainer) {
+        hamburger.addEventListener("click", () => {
+            navLinksContainer.classList.toggle("active");
+            hamburger.classList.toggle("toggle");
+        });
+    }
+
+    // ---------------- Sort Posts by Newest ----------------
+    function sortPosts() {
+        const container = document.querySelector(".news-container");
+        if (!container) return;
+
+        const posts = Array.from(container.querySelectorAll(".news-card"));
+        posts.sort((a, b) => new Date(b.dataset.time) - new Date(a.dataset.time));
+        posts.forEach(post => container.appendChild(post));
+    }
+
+    // ---------------- Time Ago ----------------
+    function getTimeAgo(dateString) {
+        const now = new Date();
+        const postTime = new Date(dateString);
+        const diffMinutes = Math.floor((now - postTime) / 60000);
+
+        if (diffMinutes < 60) {
+            return diffMinutes <= 1 ? "1 minute ago" : `${diffMinutes} minutes ago`;
+        } else {
+            const hours = Math.floor(diffMinutes / 60);
+            return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
+        }
+    }
+
+    function updateTime() {
+        document.querySelectorAll(".news-card").forEach(card => {
+            const timeElement = card.querySelector(".time");
+            if (timeElement) timeElement.textContent = "Posted " + getTimeAgo(card.dataset.time);
+        });
+
+        const alertSection = document.querySelector(".alert");
+        if (alertSection) {
+            const alertTime = alertSection.querySelector(".alert-time");
+            if (alertTime) alertTime.textContent = getTimeAgo(alertSection.dataset.time);
+        }
+    }
+
+    // ---------------- Modal ----------------
+    const modal = document.getElementById("newsModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalDescription = document.getElementById("modalDescription");
+    const modalImage = document.getElementById("modalImage");
+    const modalVideo = document.getElementById("modalVideo");
+    const closeBtn = document.querySelector(".close");
+
+    function openModal(title, description, imageSrc = null, videoSrc = null) {
+        modalTitle.textContent = title;
+        modalDescription.innerHTML = description;
+
+        if (imageSrc) {
+            modalImage.src = imageSrc;
+            modalImage.style.display = "block";
+        } else {
+            modalImage.style.display = "none";
+            modalImage.src = "";
+        }
+
+        if (videoSrc) {
+            modalVideo.src = videoSrc;
+            modalVideo.style.display = "block";
+        } else {
+            modalVideo.style.display = "none";
+            modalVideo.pause();
+            modalVideo.src = "";
+        }
+
+        modal.style.display = "block";
+    }
+
+    function closeModal() {
+        modal.style.display = "none";
+        if (modalVideo) {
+            modalVideo.pause();
+            modalVideo.src = "";
+        }
+    }
+
+    if (closeBtn) closeBtn.addEventListener("click", closeModal);
+    window.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+
+    // Open modal for news cards
+    document.querySelectorAll(".news-card").forEach(card => {
+        card.addEventListener("click", () => {
+            openModal(card.dataset.title, card.dataset.description, card.dataset.image, card.dataset.video);
+        });
+    });
+
+    // Open modal for alert
+    const alertSection = document.querySelector(".alert");
+    if (alertSection) {
+        alertSection.addEventListener("click", () => {
+            openModal(alertSection.dataset.title, alertSection.dataset.description, alertSection.dataset.image);
+        });
+    }
+
+    // ---------------- Search ----------------
+    const searchInput = document.getElementById("searchInput");
+    const searchBtn = document.getElementById("searchBtn");
+
+    function filterPosts() {
+        if (!searchInput) return;
+        const query = searchInput.value.toLowerCase();
+
+        document.querySelectorAll(".news-card").forEach(card => {
+            const title = card.dataset.title.toLowerCase();
+            const desc = card.dataset.description.toLowerCase();
+            card.style.display = title.includes(query) || desc.includes(query) ? "block" : "none";
+        });
+
+        if (alertSection) {
+            const title = alertSection.dataset.title.toLowerCase();
+            const desc = alertSection.dataset.description.toLowerCase();
+            alertSection.style.display = title.includes(query) || desc.includes(query) ? "block" : "none";
+        }
+    }
+
+    if (searchBtn) searchBtn.addEventListener("click", filterPosts);
+    if (searchInput) searchInput.addEventListener("keyup", filterPosts);
+
+    // ---------------- Category Filtering ----------------
+    const navLinks = document.querySelectorAll(".nav-links a");
+
+    navLinks.forEach(link => {
+        link.addEventListener("click", function(e) {
+            const category = this.dataset.category || this.textContent.trim();
+
+            // Skip "Submit Tip"
+            if (this.classList.contains("btn-submit")) return;
+
+            e.preventDefault();
+
+            document.querySelectorAll(".news-card").forEach(card => {
+                card.style.display = (category === "All" || card.dataset.category === category) ? "block" : "none";
+            });
+
+            // Highlight active link
+            navLinks.forEach(l => l.classList.remove("active"));
+            this.classList.add("active");
+
+            // Close hamburger menu on mobile
+            if (window.innerWidth < 768 && hamburger && navLinksContainer) {
+                navLinksContainer.classList.remove("active");
+                hamburger.classList.remove("toggle");
+            }
+        });
+    });
+
+    // ---------------- Initial Setup ----------------
+    sortPosts();
+    updateTime();
+    setInterval(updateTime, 60000);
+});
