@@ -57,6 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const closeBtn = document.querySelector(".close");
 
     function openModal(title, description, imageSrc = null, videoSrc = null) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
         modalTitle.textContent = title;
         modalDescription.innerHTML = description;
 
@@ -195,6 +196,12 @@ const ads = [
         link: "https://example.com/ad3",
         caption: "🔥 Affordable laptops for students 🔥 👉For more details and consultation  message or call 0701371126, 0765013616",
         badge: "Breaking Deal"
+    },
+    {
+        image: "laundry.jfif",
+        link: "https://example.com/ad3",
+        caption: "Start the new semester with sparkling laundry. Ens Laundry is here for you.",
+        badge: "New"
     }
 ];
 

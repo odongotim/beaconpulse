@@ -17,6 +17,12 @@
     z-index: 1000;
 }
 
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .logo {
     font-size: 1.5rem;
     letter-spacing: 1px;
@@ -36,6 +42,7 @@
     display: flex;
     list-style: none;
     align-items: center;
+    gap: 20px;
 }
 
 .nav-links li {
@@ -60,6 +67,14 @@
     color: #002347 !important;
 }
 
+.hamburger span {
+    width: 25px;
+    height: 3px;
+    background: black;
+    margin: 4px 0;
+    transition: 0.3s;
+}
+
 .hamburger {
     display: none;
     flex-direction: column;
@@ -76,24 +91,34 @@
 @media screen and (max-width: 768px) {
     .hamburger {
         display: flex;
-    }
-    .nav-links {
-        position: absolute;
-        right: 0;
-        height: 92vh;
-        top: 8vh;
-        background-color: #002347;
         flex-direction: column;
+        gap: 5px;
+        cursor: pointer;
+        z-index: 1001;
+    }
+    
+    .nav-links {
+        position: fixed;        /* KEY FIX */
+        top: 0;
+        right: -100%;           /* Hide off-screen */
         width: 70%;
-        transform: translateX(100%);
-        transition: transform 0.5s ease-in;
-        padding-top: 50px;
+        height: 100vh;
+        background: #002b4f;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 30px;
+        transition: right 0.3s ease;
+        z-index: 1000;
     }
     .nav-links li {
         margin: 20px 0;
     }
     .nav-links.active {
-        transform: translateX(0%);
+        right: 0;
+    }
+    body {
+        overflow-x: hidden;
     }
 }
 .form-wrapper {
