@@ -163,3 +163,96 @@ document.addEventListener("DOMContentLoaded", () => {
     updateTime();
     setInterval(updateTime, 60000);
 });
+// ---------------- Advertisement Slideshow ----------------
+
+const ads = [
+    {
+        image: "rody.jpeg",
+        link: "https://example.com/ad1",
+        caption: "Special Discount – 30% Off!",
+        badge: "Sponsored"
+    },
+    {
+        image: "spot.jfif",
+        link: "https://example.com/ad2",
+        caption: "Join Our Sports Academy Today!",
+        badge: "Promo"
+    },
+    {
+        image: "staurt.jpeg",
+        link: "https://example.com/ad3",
+        caption: "New Tech Devices Available Now!",
+        badge: "Breaking Deal"
+    },
+    {
+        image: "lotty.jfif",
+        link: "https://example.com/ad3",
+        caption: "Lotyang Innocent Olum For Guild",
+        badge: "Politics"
+    },
+    {
+        image: "pc.jfif",
+        link: "https://example.com/ad3",
+        caption: "🔥 Affordable laptops for students 🔥 👉For more details and consultation  message or call 0701371126, 0765013616",
+        badge: "Breaking Deal"
+    }
+];
+
+let currentAd = 0;
+let adInterval;
+
+// Get elements
+const adImage = document.getElementById("adImage");
+const adLink = document.getElementById("adLink");
+const adCaption = document.getElementById("adCaption");
+const adBadge = document.getElementById("adBadge");
+const prevBtn = document.querySelector(".ad-prev");
+const nextBtn = document.querySelector(".ad-next");
+
+function showAd(index) {
+    if (!adImage) return;
+
+    adImage.style.opacity = 0;
+
+    setTimeout(() => {
+        adImage.src = ads[index].image;
+        adLink.href = ads[index].link;
+        adCaption.textContent = ads[index].caption;
+        adBadge.textContent = ads[index].badge;
+        adImage.style.opacity = 1;
+    }, 300);
+}
+
+function nextAd() {
+    currentAd = (currentAd + 1) % ads.length;
+    showAd(currentAd);
+}
+
+function prevAd() {
+    currentAd = (currentAd - 1 + ads.length) % ads.length;
+    showAd(currentAd);
+}
+
+function startAutoRotate() {
+    adInterval = setInterval(nextAd, 6000); // 6 seconds
+}
+
+function stopAutoRotate() {
+    clearInterval(adInterval);
+}
+
+// Initialize slideshow
+if (adImage && adLink && adCaption && adBadge) {
+    showAd(currentAd);
+    startAutoRotate();
+}
+
+// Button controls
+if (nextBtn) nextBtn.addEventListener("click", nextAd);
+if (prevBtn) prevBtn.addEventListener("click", prevAd);
+
+// Pause rotation on hover (professional behavior)
+if (adImage) {
+    adImage.addEventListener("mouseenter", stopAutoRotate);
+    adImage.addEventListener("mouseleave", startAutoRotate);
+}
