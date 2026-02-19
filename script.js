@@ -306,7 +306,7 @@ async function loadNews() {
         card.className = "news-card";
 
         card.innerHTML = `
-            <img src="${item.ImageURL}">
+            <img src="${convertDriveLink(item.File)}" loading="lazy">
             <h3>${item.Title}</h3>
             <p>${item.Description.substring(0,120)}...</p>
             <span class="category">${item.Category}</span>
