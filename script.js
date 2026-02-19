@@ -290,7 +290,9 @@ function closeNewsPopup() {
 
     window.scrollTo(0, scrollPosition); // return to where user was
 }
-const sheetURL = "https://opensheet.elk.sh/1hhE1DXSssZx58JdEpn6AXbroXcOiht0AcaDPlvvfe_U/beaconpulse";
+
+const sheetURL = "https://opensheet.elk.sh/1hhE1DXSssZx58JdEpn6AXbroXcOiht0AcaDPlvvfe_U/Form%20Responses%201";
+
 const container = document.querySelector(".news-container");
 
 async function loadNews() {
@@ -299,19 +301,52 @@ async function loadNews() {
 
     container.innerHTML = "";
 
-    // Reverse to show newest first
     data.reverse().forEach(item => {
+
+        const imageUrl = convertDriveLink(item.File);
 
         const card = document.createElement("div");
         card.className = "news-card";
 
+        // Use Date + Time combined
+        const dateTime = `${item.Date} ${item.Time}`;
+
+        card.dataset.title = item.Title;
+        card.dataset.description = item["Full Description"];
+        card.dataset.image = imageUrl;
+        card.dataset.category = item.Category;
+        card.dataset.time = dateTime;
+
         card.innerHTML = `
-            <img src="${convertDriveLink(item.File)}" loading="lazy">
+            <img src="${imageUrl}" loading="lazy">
             <h3>${item.Title}</h3>
-            <p>${item.Description.substring(0,120)}...</p>
-            <span class="category">${item.Category}</span>
+            <p>${item.Headline}</p>
+            <span class="time">Loading...</span>
         `;
 
         container.appendChild(card);
     });
+
+    updateTime(); // your existing time ago function
 }
+
+loadNews();
+
+
+function convertDriveLink(url) {
+    if (!url) return "";
+    const idMatch = url.match(/id=([^&]+)/);
+    return idMatch 
+        ? `https://drive.google.com/uc?export=view&id=${idMatch[1]}`
+        : url;
+}
+
+document.querySelectorAll(".news-card").forEach(card => {
+    card.addEventListener("click", () => {
+        openModal(
+            card.dataset.title,
+            card.dataset.description,
+            card.dataset.image
+        );
+    });
+});
