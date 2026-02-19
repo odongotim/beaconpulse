@@ -119,8 +119,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             data.reverse().forEach(item => {
                 const imageUrl = convertDriveLink(item.File);
-                const dateTime = item.Timestamp; // e.g., "2/19/2026 12:30:00"
-                card.dataset.time = dateTime;
+                const dateTime = item.Timestamp || `${item.Date} ${item.Time}`;
+                const parsedDate = new Date(dateTime);
+                if (isNaN(parsedDate)) return;
 
                 const card = document.createElement("div");
                 card.className = "news-card";
@@ -128,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 card.dataset.description = item["Full Description"];
                 card.dataset.image = imageUrl;
                 card.dataset.category = item.Category;
-                card.dataset.time = dateTime;
+                card.dataset.time = parsedDate.toISOString();
 
                 card.innerHTML = `
                     <img src="${imageUrl}" loading="lazy">
@@ -152,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Failed to load news:", error);
         }
     }
-
+    
     loadNews();
     setInterval(loadNews, 300000); // auto-refresh every 5 minutes
 
