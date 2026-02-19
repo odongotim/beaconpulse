@@ -429,97 +429,80 @@ footer {
 }
 .ad-slideshow {
     width: 100%;
+    overflow: hidden;
     margin: 20px 0;
-    position: relative;
-}
-
-.ad-label {
-    font-size: 12px;
-    color: gray;
-    margin-bottom: 5px;
-    text-align: left;
+    display: flex;
+    justify-content: center;
 }
 
 .ad-container {
-    position: relative;
     width: 100%;
-    max-width: 900px; /* controls how wide the ad can be */
+    max-width: 900px;
     overflow: hidden;
+}
+
+.ad-track {
+    display: flex;
+    gap: 20px;
+    width: max-content; /* VERY IMPORTANT */
+    animation: scrollAds 45s linear infinite;
+}
+
+.ad-item {
+    min-width: 300px;
+    height: 220px;              /* Fixed card height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f5f5;        /* neutral background */
+    position: relative;
     border-radius: 12px;
+    overflow: hidden;
 }
 
-#adImage {
-    width: 100%;
-    height: auto;
+.ad-item img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;        /* shows full image */
     display: block;
-    transition: opacity 0.5s ease-in-out;
 }
 
-/* Caption overlay */
-.ad-caption {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    text-align: center;
-    width: 100%;
-    padding: 10px;
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-    font-size: 14px;
-}
 
-/* Side buttons */
-.ad-prev,
-.ad-next {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    font-size: 20px;
-    padding: 10px 14px;
-    cursor: pointer;
-    border-radius: 50%;
-}
-
-.ad-prev { left: 10px; }
-.ad-next { right: 10px; }
-
-.ad-prev:hover,
-.ad-next:hover {
-    background: rgba(0, 0, 0, 0.8);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .ad-caption {
-        font-size: 20px;
-    }
-}
-
+/* Badge */
 .ad-badge {
     position: absolute;
     top: 10px;
     left: 10px;
     background: #ff3b3b;
     color: white;
-    padding: 5px 10px;
+    padding: 4px 8px;
     font-size: 12px;
-    font-weight: bold;
     border-radius: 20px;
-    z-index: 2;
 }
 
-/* Ensure container allows positioning */
-.ad-container {
-    position: relative;
-    overflow: hidden;
-    border-radius: 12px;
-}
-.ad-slideshow {
+/* Caption */
+.ad-caption {
+    position: absolute;
+    bottom: 0;
     width: 100%;
-    margin: 20px 0;
-    display: flex;
-    justify-content: center; /* centers the entire ad block */
+    background: rgba(0,0,0,0.6);
+    color: white;
+    padding: 8px;
+    font-size: 13px;
+    text-align: center;
+}
+
+.ad-container:hover .ad-track {
+    animation-play-state: paused;
+}
+
+
+/* Continuous infinite scroll */
+@keyframes scrollAds {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
 }

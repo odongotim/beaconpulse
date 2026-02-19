@@ -234,61 +234,26 @@ const ads = [
     }
 ];
 
-let currentAd = 0;
-let adInterval;
+const adTrack = document.getElementById("adTrack");
 
-// Get elements
-const adImage = document.getElementById("adImage");
-const adLink = document.getElementById("adLink");
-const adCaption = document.getElementById("adCaption");
-const adBadge = document.getElementById("adBadge");
-const prevBtn = document.querySelector(".ad-prev");
-const nextBtn = document.querySelector(".ad-next");
+if (adTrack) {
 
-function showAd(index) {
-    if (!adImage) return;
+    function createAd(ad) {
+        const adItem = document.createElement("a");
+        adItem.href = ad.link;
+        adItem.target = "_blank";
+        adItem.className = "ad-item";
 
-    adImage.style.opacity = 0;
+        adItem.innerHTML = `
+            <span class="ad-badge">${ad.badge}</span>
+            <img src="${ad.image}" loading="lazy">
+            <div class="ad-caption">${ad.caption}</div>
+        `;
 
-    setTimeout(() => {
-        adImage.src = ads[index].image;
-        adLink.href = ads[index].link;
-        adCaption.textContent = ads[index].caption;
-        adBadge.textContent = ads[index].badge;
-        adImage.style.opacity = 1;
-    }, 300);
-}
+        return adItem;
+    }
 
-function nextAd() {
-    currentAd = (currentAd + 1) % ads.length;
-    showAd(currentAd);
-}
-
-function prevAd() {
-    currentAd = (currentAd - 1 + ads.length) % ads.length;
-    showAd(currentAd);
-}
-
-function startAutoRotate() {
-    adInterval = setInterval(nextAd, 6000); // 6 seconds
-}
-
-function stopAutoRotate() {
-    clearInterval(adInterval);
-}
-
-// Initialize slideshow
-if (adImage && adLink && adCaption && adBadge) {
-    showAd(currentAd);
-    startAutoRotate();
-}
-
-// Button controls
-if (nextBtn) nextBtn.addEventListener("click", nextAd);
-if (prevBtn) prevBtn.addEventListener("click", prevAd);
-
-// Pause rotation on hover (professional behavior)
-if (adImage) {
-    adImage.addEventListener("mouseenter", stopAutoRotate);
-    adImage.addEventListener("mouseleave", startAutoRotate);
+    // Add ads twice for seamless infinite scroll
+    ads.forEach(ad => adTrack.appendChild(createAd(ad)));
+    ads.forEach(ad => adTrack.appendChild(createAd(ad)));
 }
