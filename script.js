@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const [day, month, year] = datePart.split("/");
         const [hours, minutes, seconds] = timePart.split(":");
 
-        return new Date(year, month - 1, day, hours, minutes, seconds);
+        return new Date(year, month - 1, day, hours || 0, minutes || 0, seconds || 0);
     }
 
     // ---------------- Convert Drive Links ----------------
@@ -31,29 +31,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ---------------- Load News ----------------
     async function loadNews() {
+        if (!container) {
+            console.error("No .news-container found in HTML");
+            return;
+        }
+
         try {
             console.log("Loading news...");
 
             const response = await fetch(sheetURL);
-            const data = await response.json();
 
-            console.log("Fetched data:", data);
-
-            if (!Array.isArray(data)) {
-                console.error("Sheet did not return array.");
-                container.innerHTML = "<p>No valid news data.</p>";
-                return;
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
 
-            if (!container) {
-                console.error("No .news-container found in HTML");
+            const data = await response.json();
+            console.log("Fetched data:", data);
+
+            if (!Array.isArray(data) || data.length === 0) {
+                container.innerHTML = "<p>No news available.</p>";
                 return;
             }
 
             container.innerHTML = "";
 
-            [...data].reverse().forEach(item => {
-
+            // Display newest first
+            data.reverse().forEach(item => {
                 const parsedDate = parseUgandaTimestamp(item.Timestamp);
                 const imageUrl = convertDriveLink(item.File);
 
@@ -97,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const adItem = document.createElement("div");
             adItem.className = "ad-item";
             adItem.innerHTML = `
-                <img src="${ad.image}">
+                <img src="${ad.image}" alt="Ad">
                 <div>${ad.caption}</div>
             `;
             adTrack.appendChild(adItem);
