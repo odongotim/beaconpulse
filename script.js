@@ -115,18 +115,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function loadNews() {
         try {
-            const response = await fetch(sheetURL);
+            const response = await fetch(sheetURL + "?t=" + new Date().getTime()); // prevent caching
             const data = await response.json();
 
             container.innerHTML = "";
 
             data.reverse().forEach(item => {
-                // Use Timestamp or fallback
                 const dateTime = item.Timestamp || `${item.Date} ${item.Time}`;
                 const parsedDate = new Date(dateTime);
                 if (isNaN(parsedDate)) return;
 
-                // Convert Drive link and fallback to placeholder
                 const imageUrl = convertDriveLink(item.File) || "placeholder.jpg";
 
                 const card = document.createElement("div");
@@ -146,7 +144,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 container.appendChild(card);
 
-                // Click opens modal
                 card.addEventListener("click", () => {
                     openModal(card.dataset.title, card.dataset.description, card.dataset.image);
                 });
@@ -168,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     loadNews();
-    setInterval(loadNews, 300000);
+    setInterval(loadNews, 60000); // refresh every 1 minute
 
     // ---------------- Search ----------------
     const searchInput = document.getElementById("searchInput");
