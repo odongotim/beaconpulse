@@ -67,6 +67,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const postTime = new Date(dateString);
         const diffMs = now - postTime;
 
+        if (isNaN(postTime)) return "Unknown time";
+
         const minutes = Math.floor(diffMs / (1000 * 60));
         const hours = Math.floor(diffMs / (1000 * 60 * 60));
         const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
@@ -95,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    setInterval(updateTime, 60000); // update every 1 minute
+    setInterval(updateTime, 60000);
 
     // ---------------- Sorting ----------------
     function sortPosts() {
@@ -108,20 +110,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ---------------- Google Sheets Fetch ----------------
-    const sheetURL = "https://opensheet.elk.sh/1hhE1DXSssZx58JdEpn6AXbroXcOiht0AcaDPlvvfe_U/beaconpulse";
+    const sheetURL = "https://opensheet.elk.sh/1hhE1DXSssZx58JdEpn6AXbroXcOiht0AcaDPlvvfe_U/Form%20Responses%201";
     const container = document.querySelector(".news-container");
 
     async function loadNews() {
         try {
             const response = await fetch(sheetURL);
             const data = await response.json();
+
             container.innerHTML = "";
 
             data.reverse().forEach(item => {
-                const imageUrl = convertDriveLink(item.File);
+                // Use Timestamp or fallback
                 const dateTime = item.Timestamp || `${item.Date} ${item.Time}`;
                 const parsedDate = new Date(dateTime);
                 if (isNaN(parsedDate)) return;
+
+                // Convert Drive link and fallback to placeholder
+                const imageUrl = convertDriveLink(item.File) || "placeholder.jpg";
 
                 const card = document.createElement("div");
                 card.className = "news-card";
@@ -132,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 card.dataset.time = parsedDate.toISOString();
 
                 card.innerHTML = `
-                    <img src="${imageUrl}" loading="lazy">
+                    <img src="${imageUrl}" loading="lazy" alt="${item.Title}">
                     <h3>${item.Title}</h3>
                     <p>${item.Headline}</p>
                     <span class="time">Loading...</span>
@@ -140,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 container.appendChild(card);
 
-                // Add click event for modal
+                // Click opens modal
                 card.addEventListener("click", () => {
                     openModal(card.dataset.title, card.dataset.description, card.dataset.image);
                 });
@@ -153,17 +159,16 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Failed to load news:", error);
         }
     }
-    
-    loadNews();
-    setInterval(loadNews, 300000); // auto-refresh every 5 minutes
 
     // ---------------- Convert Google Drive Links ----------------
     function convertDriveLink(url) {
-    if (!url) return "";
-    const idMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/); // match /d/FILE_ID/
-    return idMatch ? `https://drive.google.com/uc?export=view&id=${idMatch[1]}` : url;
-}
+        if (!url) return "";
+        const idMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
+        return idMatch ? `https://drive.google.com/uc?export=view&id=${idMatch[1]}` : url;
+    }
 
+    loadNews();
+    setInterval(loadNews, 300000);
 
     // ---------------- Search ----------------
     const searchInput = document.getElementById("searchInput");
@@ -238,7 +243,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return adItem;
         }
 
-        // Add ads twice for seamless infinite scroll
         ads.forEach(ad => adTrack.appendChild(createAd(ad)));
         ads.forEach(ad => adTrack.appendChild(createAd(ad)));
     }
