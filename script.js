@@ -191,28 +191,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
 const ads = [
     {
-        image: "rody.jpeg",
-        link: "",
-        caption: "Special Discount – 30% Off!",
-        badge: "Sponsored"
-    },
-    {
         image: "screen.jfif",
         link: "",
         caption: "For affordable screen replacement and repair reach to Staurt Enterprises or call 0760638570",
         badge: "Hotest Deal"
     },
     {
-        image: "spot.jfif",
+        image: "rody.jpeg",
         link: "",
-        caption: "Join Our Sports Academy Today!",
-        badge: "Sports"
+        caption: "Special Discount – 30% Off!",
+        badge: "Sponsored"
     },
     {
         image: "staurt.jpeg",
         link: "",
         caption: "New Tech Devices Available Now!",
         badge: "Breaking Deal"
+    },
+    {
+        image: "spot.jfif",
+        link: "",
+        caption: "Join Our Sports Academy Today!",
+        badge: "Sports"
     },
     {
         image: "lotty.jfif",
