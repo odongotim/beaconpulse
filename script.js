@@ -290,4 +290,31 @@ function closeNewsPopup() {
 
     window.scrollTo(0, scrollPosition); // return to where user was
 }
+const sheetURL = "https://opensheet.elk.sh/2PACX-1vTH9GuWuw9qcliOdPvNBFokmLW4E5jtK1WnkmkXKoac6VaNTOAxYHti-Xc1N2r40rlg5EXxiB-2BE_k/thebeaconpulse";
+const container = document.querySelector(".news-container");
+
+async function loadNews() {
+    const response = await fetch(sheetURL);
+    const data = await response.json();
+
+    container.innerHTML = "";
+
+    // Reverse to show newest first
+    data.reverse().forEach(item => {
+
+        const card = document.createElement("div");
+        card.className = "news-card";
+
+        card.innerHTML = `
+            <img src="${item.ImageURL}">
+            <h3>${item.Title}</h3>
+            <p>${item.Description.substring(0,120)}...</p>
+            <span class="category">${item.Category}</span>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+loadNews();
 
