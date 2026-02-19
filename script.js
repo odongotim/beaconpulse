@@ -79,8 +79,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalVideo = document.getElementById("modalVideo");
     const closeBtn = document.querySelector(".close");
 
+    let savedScrollPosition = 0;
     function openModal(title, description, imageSrc = null, videoSrc = null) {
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        savedScrollPosition = window.scrollY;
         modalTitle.textContent = title;
         modalDescription.innerHTML = description;
 
@@ -106,6 +107,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function closeModal() {
         modal.style.display = "none";
+
+        document.body.style.position = "";
+        document.body.style.top = "";
+
+    window.scrollTo(0, savedScrollPosition);
+
         if (modalVideo) {
             modalVideo.pause();
             modalVideo.src = "";
@@ -129,6 +136,11 @@ document.addEventListener("DOMContentLoaded", () => {
             openModal(alertSection.dataset.title, alertSection.dataset.description, alertSection.dataset.image);
         });
     }
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeModal();
+    });
+
 
     // ---------------- Search ----------------
     const searchInput = document.getElementById("searchInput");
@@ -257,3 +269,25 @@ if (adTrack) {
     ads.forEach(ad => adTrack.appendChild(createAd(ad)));
     ads.forEach(ad => adTrack.appendChild(createAd(ad)));
 }
+
+let scrollPosition = 0;
+
+function openNewsPopup(content) {
+    scrollPosition = window.scrollY; // save position
+    
+    document.getElementById("newsPopup").classList.add("active");
+
+    // Optional: prevent background scroll
+    document.body.style.top = `-${scrollPosition}px`;
+    document.body.style.position = "fixed";
+}
+
+function closeNewsPopup() {
+    document.getElementById("newsPopup").classList.remove("active");
+
+    document.body.style.position = "";
+    document.body.style.top = "";
+
+    window.scrollTo(0, scrollPosition); // return to where user was
+}
+
