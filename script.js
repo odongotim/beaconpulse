@@ -1,3 +1,5 @@
+
+console.log("JS FILE IS RUNNING");
 document.addEventListener("DOMContentLoaded", () => {
 
     const sheetURL = "https://opensheet.elk.sh/1hhE1DXSssZx58JdEpn6AXbroXcOiht0AcaDPlvvfe_U/News";
