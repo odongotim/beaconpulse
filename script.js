@@ -23,17 +23,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ---------------- Time Ago ----------------
     function getTimeAgo(dateString) {
-        const now = new Date();
-        const postTime = new Date(dateString);
-        const diffMinutes = Math.floor((now - postTime) / 60000);
+    const now = new Date();
+    const postTime = new Date(dateString);
+    const diffMs = now - postTime;
 
-        if (diffMinutes < 60) {
-            return diffMinutes <= 1 ? "1 minute ago" : `${diffMinutes} minutes ago`;
-        } else {
-            const hours = Math.floor(diffMinutes / 60);
-            return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
-        }
+    const minutes = Math.floor(diffMs / (1000 * 60));
+    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const weeks = Math.floor(days / 7);
+    const months = Math.floor(weeks / 4);
+    const years = Math.floor(months / 12);
+
+    if (minutes < 60) {
+        return minutes <= 1 ? "1 minute ago" : `${minutes} minutes ago`;
     }
+
+    if (hours < 24) {
+        return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
+    }
+
+    if (days < 7) {
+        return days === 1 ? "1 day ago" : `${days} days ago`;
+    }
+
+    if (weeks < 4) {
+        return weeks === 1 ? "1 week ago" : `${weeks} weeks ago`;
+    }
+
+    if (months < 12) {
+        return months === 1 ? "1 month ago" : `${months} months ago`;
+    }
+    
+    return years === 1 ? "1 year ago" : `${years} years ago`;
+}
+
 
     function updateTime() {
         document.querySelectorAll(".news-card").forEach(card => {
@@ -169,37 +192,37 @@ document.addEventListener("DOMContentLoaded", () => {
 const ads = [
     {
         image: "rody.jpeg",
-        link: "https://example.com/ad1",
+        link: "",
         caption: "Special Discount – 30% Off!",
         badge: "Sponsored"
     },
     {
         image: "spot.jfif",
-        link: "https://example.com/ad2",
+        link: "",
         caption: "Join Our Sports Academy Today!",
-        badge: "Promo"
+        badge: "Sports"
     },
     {
         image: "staurt.jpeg",
-        link: "https://example.com/ad3",
+        link: "",
         caption: "New Tech Devices Available Now!",
         badge: "Breaking Deal"
     },
     {
         image: "lotty.jfif",
-        link: "https://example.com/ad3",
+        link: "",
         caption: "Lotyang Innocent Olum For Guild",
         badge: "Politics"
     },
     {
         image: "pc.jfif",
-        link: "https://example.com/ad3",
+        link: "",
         caption: "🔥 Affordable laptops for students 🔥 👉For more details and consultation  message or call 0701371126, 0765013616",
         badge: "Breaking Deal"
     },
     {
         image: "laundry.jfif",
-        link: "https://example.com/ad3",
+        link: "",
         caption: "Start the new semester with sparkling laundry. Ens Laundry is here for you.",
         badge: "New"
     }
