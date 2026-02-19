@@ -315,6 +315,3 @@ async function loadNews() {
         container.appendChild(card);
     });
 }
-
-loadNews();
-
