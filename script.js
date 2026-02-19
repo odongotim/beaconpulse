@@ -1,260 +1,107 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    // ---------------- Hamburger Menu ----------------
-    const hamburger = document.getElementById("hamburger");
-    const navLinksContainer = document.getElementById("nav-links");
-    if (hamburger && navLinksContainer) {
-        hamburger.addEventListener("click", () => {
-            navLinksContainer.classList.toggle("active");
-            hamburger.classList.toggle("toggle");
-        });
-    }
-
-    // ---------------- Modal ----------------
-    const modal = document.getElementById("newsModal");
-    const modalTitle = document.getElementById("modalTitle");
-    const modalDescription = document.getElementById("modalDescription");
-    const modalImage = document.getElementById("modalImage");
-    const modalVideo = document.getElementById("modalVideo");
-    const closeBtn = document.querySelector(".close");
-    let savedScrollPosition = 0;
-
-    function openModal(title, description, imageSrc = null, videoSrc = null) {
-        savedScrollPosition = window.scrollY;
-        modalTitle.textContent = title;
-        modalDescription.innerHTML = description;
-
-        if (imageSrc) {
-            modalImage.src = imageSrc;
-            modalImage.style.display = "block";
-        } else {
-            modalImage.style.display = "none";
-            modalImage.src = "";
-        }
-
-        if (videoSrc) {
-            modalVideo.src = videoSrc;
-            modalVideo.style.display = "block";
-        } else {
-            modalVideo.style.display = "none";
-            modalVideo.pause();
-            modalVideo.src = "";
-        }
-
-        modal.style.display = "block";
-    }
-
-    function closeModal() {
-        modal.style.display = "none";
-        document.body.style.position = "";
-        document.body.style.top = "";
-        window.scrollTo(0, savedScrollPosition);
-
-        if (modalVideo) {
-            modalVideo.pause();
-            modalVideo.src = "";
-        }
-    }
-
-    if (closeBtn) closeBtn.addEventListener("click", closeModal);
-    window.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
-
-    // ---------------- Time Ago ----------------
-    function getTimeAgo(dateString) {
-        const now = new Date();
-        const postTime = new Date(dateString);
-        const diffMs = now - postTime;
-        if (isNaN(postTime)) return "Unknown time";
-
-        const minutes = Math.floor(diffMs / (1000 * 60));
-        const hours = Math.floor(diffMs / (1000 * 60 * 60));
-        const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-        const weeks = Math.floor(days / 7);
-        const months = Math.floor(weeks / 4);
-        const years = Math.floor(months / 12);
-
-        if (minutes < 60) return minutes <= 1 ? "1 minute ago" : `${minutes} minutes ago`;
-        if (hours < 24) return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
-        if (days < 7) return days === 1 ? "1 day ago" : `${days} days ago`;
-        if (weeks < 4) return weeks === 1 ? "1 week ago" : `${weeks} weeks ago`;
-        if (months < 12) return months === 1 ? "1 month ago" : `${months} months ago`;
-        return years === 1 ? "1 year ago" : `${years} years ago`;
-    }
-
-    function updateTime() {
-        document.querySelectorAll(".news-card").forEach(card => {
-            const timeElement = card.querySelector(".time");
-            if (timeElement) timeElement.textContent = "Posted " + getTimeAgo(card.dataset.time);
-        });
-
-        const alertSection = document.querySelector(".alert");
-        if (alertSection) {
-            const alertTime = alertSection.querySelector(".alert-time");
-            if (alertTime) alertTime.textContent = getTimeAgo(alertSection.dataset.time);
-        }
-    }
-
-    setInterval(updateTime, 60000);
-
-    // ---------------- Sorting ----------------
-    function sortPosts() {
-        const container = document.querySelector(".news-container");
-        if (!container) return;
-        const posts = Array.from(container.querySelectorAll(".news-card"));
-        posts.sort((a, b) => new Date(b.dataset.time) - new Date(a.dataset.time));
-        posts.forEach(post => container.appendChild(post));
-    }
-
-    // ---------------- Google Sheets Fetch ----------------
-    const sheetURL = "https://opensheet.elk.sh/1hhE1DXSssZx58JdEpn6AXbroXcOiht0AcaDPlvvfe_U/Form%20Responses%201"; // <-- your correct tab
+    const sheetURL = "https://opensheet.elk.sh/1hhE1DXSssZx58JdEpn6AXbroXcOiht0AcaDPlvvfe_U/News";
     const container = document.querySelector(".news-container");
-    const parsedDate = parseUgandaTimestamp(item.Timestamp);
+
+    // ---------------- Timestamp Parser ----------------
+    function parseUgandaTimestamp(timestamp) {
+        if (!timestamp) return new Date();
+
+        const [datePart, timePart] = timestamp.split(" ");
+        if (!datePart || !timePart) return new Date();
+
+        const [day, month, year] = datePart.split("/");
+        const [hours, minutes, seconds] = timePart.split(":");
+
+        return new Date(year, month - 1, day, hours, minutes, seconds);
+    }
+
+    // ---------------- Convert Drive Links ----------------
+    function convertDriveLink(url) {
+        if (!url) return "placeholder.jpg";
+
+        const idMatch =
+            url.match(/\/d\/([a-zA-Z0-9_-]+)/) ||
+            url.match(/id=([a-zA-Z0-9_-]+)/);
+
+        return idMatch
+            ? `https://drive.google.com/uc?export=view&id=${idMatch[1]}`
+            : url;
+    }
+
+    // ---------------- Load News ----------------
     async function loadNews() {
         try {
+            console.log("Loading news...");
+
             const response = await fetch(sheetURL);
             const data = await response.json();
-            console.log("loadNews running");
-            console.log("Fetched data:", data); // Debug: check console
 
-            // Safely check if data is array
-            const rows = Array.isArray(data) ? data : (Array.isArray(data.rows) ? data.rows : []);
-            if (!rows.length) {
-                container.innerHTML = "<p>No news available yet.</p>";
+            console.log("Fetched data:", data);
+
+            if (!Array.isArray(data)) {
+                console.error("Sheet did not return array.");
+                container.innerHTML = "<p>No valid news data.</p>";
+                return;
+            }
+
+            if (!container) {
+                console.error("No .news-container found in HTML");
                 return;
             }
 
             container.innerHTML = "";
 
-            rows.reverse().forEach(item => {
-                const dateTime = item.Timestamp || new Date().toISOString();
-        function parseUgandaTimestamp(timestamp) {
-            if (!timestamp) return new Date();
+            [...data].reverse().forEach(item => {
 
-            const [datePart, timePart] = timestamp.split(" ");
-            if (!datePart || !timePart) return new Date();
-
-            const [day, month, year] = datePart.split("/");
-            const [hours, minutes, seconds] = timePart.split(":");
-
-            return new Date(year, month - 1, day, hours, minutes, seconds);
-        }
-
-                const imageUrl = convertDriveLink(item.File) || "placeholder.jpg";
+                const parsedDate = parseUgandaTimestamp(item.Timestamp);
+                const imageUrl = convertDriveLink(item.File);
 
                 const card = document.createElement("div");
                 card.className = "news-card";
-                card.dataset.title = item.Title || "No Title";
-                card.dataset.description = item["Full Description"] || "No Description";
-                card.dataset.image = imageUrl;
-                card.dataset.category = item.Category || "General";
                 card.dataset.time = parsedDate.toISOString();
+                card.dataset.title = item.Title || "No Title";
+                card.dataset.description = item["Full Description"] || "";
+                card.dataset.category = item.Category || "General";
 
                 card.innerHTML = `
-                    <img src="${imageUrl}" loading="lazy" alt="${item.Title || 'News'}">
-                    <h3>${item.Title || 'No Title'}</h3>
-                    <p>${item.Headline || ''}</p>
-                    <span class="time">Loading...</span>
+                    <img src="${imageUrl}" alt="${item.Title || "News"}">
+                    <h3>${item.Title || "No Title"}</h3>
+                    <p>${item.Headline || ""}</p>
+                    <span class="time">${parsedDate.toLocaleString()}</span>
                 `;
 
                 container.appendChild(card);
-
-                card.addEventListener("click", () => {
-                    openModal(card.dataset.title, card.dataset.description, card.dataset.image);
-                });
             });
-
-            sortPosts();
-            updateTime();
 
         } catch (error) {
             console.error("Failed to load news:", error);
-            container.innerHTML = "<p>Unable to fetch news.</p>";
+            container.innerHTML = "<p>Error loading news.</p>";
         }
-    }
-
-    function convertDriveLink(url) {
-        if (!url) return "";
-        const idMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
-        return idMatch ? `https://drive.google.com/uc?export=view&id=${idMatch[1]}` : url;
     }
 
     loadNews();
-    setInterval(loadNews, 60000); // refresh every 1 min
 
-    // ---------------- Search ----------------
-    const searchInput = document.getElementById("searchInput");
-    const searchBtn = document.getElementById("searchBtn");
-    const alertSection = document.querySelector(".alert");
-
-    function filterPosts() {
-        if (!searchInput) return;
-        const query = searchInput.value.toLowerCase();
-
-        document.querySelectorAll(".news-card").forEach(card => {
-            const title = card.dataset.title.toLowerCase();
-            const desc = card.dataset.description.toLowerCase();
-            card.style.display = title.includes(query) || desc.includes(query) ? "block" : "none";
-        });
-
-        if (alertSection) {
-            const title = alertSection.dataset.title.toLowerCase();
-            const desc = alertSection.dataset.description.toLowerCase();
-            alertSection.style.display = title.includes(query) || desc.includes(query) ? "block" : "none";
-        }
-    }
-
-    if (searchBtn) searchBtn.addEventListener("click", filterPosts);
-    if (searchInput) searchInput.addEventListener("keyup", filterPosts);
-
-    // ---------------- Category Filtering ----------------
-    const navLinks = document.querySelectorAll(".nav-links a");
-
-    navLinks.forEach(link => {
-        link.addEventListener("click", function (e) {
-            const category = this.dataset.category || this.textContent.trim();
-            if (this.classList.contains("btn-submit")) return;
-
-            e.preventDefault();
-            document.querySelectorAll(".news-card").forEach(card => {
-                card.style.display = (category === "All" || card.dataset.category === category) ? "block" : "none";
-            });
-            navLinks.forEach(l => l.classList.remove("active"));
-            this.classList.add("active");
-
-            if (window.innerWidth < 768 && hamburger && navLinksContainer) {
-                navLinksContainer.classList.remove("active");
-                hamburger.classList.remove("toggle");
-            }
-        });
-    });
-
-    // ---------------- Advertisement Slideshow ----------------
+    // ---------------- Advertisement ----------------
     const ads = [
-        { image: "screen.jfif", link: "", caption: "For affordable screen replacement and repair reach to Staurt Enterprises or call 0760638570", badge: "Hotest Deal" },
-        { image: "rody.jpeg", link: "", caption: "Special Discount – 30% Off!", badge: "Sponsored" },
-        { image: "staurt.jpeg", link: "", caption: "New Tech Devices Available Now!", badge: "Breaking Deal" },
-        { image: "sport.jpg", link: "", caption: "Join Our Sports Academy Today!", badge: "Sports" },
-        { image: "lotty.jfif", link: "", caption: "Lotyang Innocent Olum For Guild", badge: "Politics" },
-        { image: "pc.jfif", link: "", caption: "🔥 Affordable laptops for students 🔥 👉For more details and consultation message or call 0701371126, 0765013616", badge: "Breaking Deal" },
-        { image: "laundry.jfif", link: "", caption: "Start the new semester with sparkling laundry. Ens Laundry is here for you.", badge: "New" }
+        { image: "screen.jfif", caption: "Screen replacement & repair – 0760638570" },
+        { image: "rody.jpeg", caption: "Special Discount – 30% Off!" },
+        { image: "staurt.jpeg", caption: "New Tech Devices Available Now!" },
+        { image: "sport.jpg", caption: "Join Our Sports Academy Today!" }
     ];
 
     const adTrack = document.getElementById("adTrack");
-    if (adTrack) {
-        function createAd(ad) {
-            const adItem = document.createElement("a");
-            adItem.href = ad.link;
-            adItem.target = "_blank";
-            adItem.className = "ad-item";
-            adItem.innerHTML = `<span class="ad-badge">${ad.badge}</span>
-                                <img src="${ad.image}" loading="lazy">
-                                <div class="ad-caption">${ad.caption}</div>`;
-            return adItem;
-        }
 
-        ads.forEach(ad => adTrack.appendChild(createAd(ad)));
-        ads.forEach(ad => adTrack.appendChild(createAd(ad)));
+    if (adTrack) {
+        ads.forEach(ad => {
+            const adItem = document.createElement("div");
+            adItem.className = "ad-item";
+            adItem.innerHTML = `
+                <img src="${ad.image}">
+                <div>${ad.caption}</div>
+            `;
+            adTrack.appendChild(adItem);
+        });
     }
 
 });
