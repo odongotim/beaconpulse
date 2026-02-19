@@ -240,4 +240,9 @@ document.addEventListener("DOMContentLoaded", () => {
         ads.forEach(ad => adTrack.appendChild(createAd(ad)));
     }
 
-});
+    });if (!Array.isArray(data)) {
+        console.error("Sheet fetch returned error:", data);
+        container.innerHTML = "<p>No news available yet.</p>";
+        return;
+    }
+
