@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const response = await fetch(sheetURL);
             const data = await response.json();
-
+            console.log("loadNews running");
             console.log("Fetched data:", data); // Debug: check console
 
             // Safely check if data is array
