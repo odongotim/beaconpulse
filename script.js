@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // ---------------- Hamburger Menu ----------------
     const hamburger = document.getElementById("hamburger");
     const navLinksContainer = document.getElementById("nav-links");
-
     if (hamburger && navLinksContainer) {
         hamburger.addEventListener("click", () => {
             navLinksContainer.classList.toggle("active");
@@ -66,7 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const now = new Date();
         const postTime = new Date(dateString);
         const diffMs = now - postTime;
-
         if (isNaN(postTime)) return "Unknown time";
 
         const minutes = Math.floor(diffMs / (1000 * 60));
@@ -103,7 +101,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function sortPosts() {
         const container = document.querySelector(".news-container");
         if (!container) return;
-
         const posts = Array.from(container.querySelectorAll(".news-card"));
         posts.sort((a, b) => new Date(b.dataset.time) - new Date(a.dataset.time));
         posts.forEach(post => container.appendChild(post));
@@ -115,13 +112,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function loadNews() {
         try {
-            const response = await fetch(sheetURL + "?t=" + new Date().getTime()); // prevent caching
+            const response = await fetch(sheetURL + "?t=" + new Date().getTime());
             const data = await response.json();
+
+            console.log("Fetched data:", data); // Debug: check console
 
             container.innerHTML = "";
 
             data.reverse().forEach(item => {
-                const dateTime = item.Timestamp || `${item.Date} ${item.Time}`;
+                const dateTime = item.Timestamp || new Date().toISOString();
                 const parsedDate = new Date(dateTime);
                 if (isNaN(parsedDate)) return;
 
@@ -129,16 +128,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const card = document.createElement("div");
                 card.className = "news-card";
-                card.dataset.title = item.Title;
-                card.dataset.description = item["Full Description"];
+                card.dataset.title = item.Title || "No Title";
+                card.dataset.description = item["Full Description"] || "No Description";
                 card.dataset.image = imageUrl;
-                card.dataset.category = item.Category;
+                card.dataset.category = item.Category || "General";
                 card.dataset.time = parsedDate.toISOString();
 
                 card.innerHTML = `
-                    <img src="${imageUrl}" loading="lazy" alt="${item.Title}">
-                    <h3>${item.Title}</h3>
-                    <p>${item.Headline}</p>
+                    <img src="${imageUrl}" loading="lazy" alt="${item.Title || 'News'}">
+                    <h3>${item.Title || 'No Title'}</h3>
+                    <p>${item.Headline || ''}</p>
                     <span class="time">Loading...</span>
                 `;
 
@@ -157,7 +156,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // ---------------- Convert Google Drive Links ----------------
     function convertDriveLink(url) {
         if (!url) return "";
         const idMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/id=([a-zA-Z0-9_-]+)/);
@@ -165,7 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     loadNews();
-    setInterval(loadNews, 60000); // refresh every 1 minute
+    setInterval(loadNews, 60000); // refresh every 1 min
 
     // ---------------- Search ----------------
     const searchInput = document.getElementById("searchInput");
@@ -201,11 +199,9 @@ document.addEventListener("DOMContentLoaded", () => {
             if (this.classList.contains("btn-submit")) return;
 
             e.preventDefault();
-
             document.querySelectorAll(".news-card").forEach(card => {
                 card.style.display = (category === "All" || card.dataset.category === category) ? "block" : "none";
             });
-
             navLinks.forEach(l => l.classList.remove("active"));
             this.classList.add("active");
 
