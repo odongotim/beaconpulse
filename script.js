@@ -209,7 +209,7 @@ const ads = [
         badge: "Breaking Deal"
     },
     {
-        image: "spot.jfif",
+        image: "sport.jpg",
         link: "",
         caption: "Join Our Sports Academy Today!",
         badge: "Sports"
