@@ -197,6 +197,12 @@ const ads = [
         badge: "Sponsored"
     },
     {
+        image: "screen.jfif",
+        link: "",
+        caption: "For affordable screen replacement and repair reach to Staurt Enterprises or call 0760638570",
+        badge: "Hotest Deal"
+    },
+    {
         image: "spot.jfif",
         link: "",
         caption: "Join Our Sports Academy Today!",
