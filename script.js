@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ---------------- Google Sheets Fetch ----------------
-    const sheetURL = "https://opensheet.elk.sh/1hhE1DXSssZx58JdEpn6AXbroXcOiht0AcaDPlvvfe_U/News"; // <-- your correct tab
+    const sheetURL = "https://opensheet.elk.sh/1hhE1DXSssZx58JdEpn6AXbroXcOiht0AcaDPlvvfe_U/Form%20Responses%201"; // <-- your correct tab
     const container = document.querySelector(".news-container");
 
     async function loadNews() {
