@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ---------------- Google Sheets Fetch ----------------
     const sheetURL = "https://opensheet.elk.sh/1hhE1DXSssZx58JdEpn6AXbroXcOiht0AcaDPlvvfe_U/Form%20Responses%201"; // <-- your correct tab
     const container = document.querySelector(".news-container");
-
+    const parsedDate = parseUgandaTimestamp(item.Timestamp);
     async function loadNews() {
         try {
             const response = await fetch(sheetURL);
@@ -128,8 +128,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
             rows.reverse().forEach(item => {
                 const dateTime = item.Timestamp || new Date().toISOString();
-                const parsedDate = new Date(dateTime);
-                if (isNaN(parsedDate)) return;
+        function parseUgandaTimestamp(timestamp) {
+            if (!timestamp) return new Date();
+
+            const [datePart, timePart] = timestamp.split(" ");
+            if (!datePart || !timePart) return new Date();
+
+            const [day, month, year] = datePart.split("/");
+            const [hours, minutes, seconds] = timePart.split(":");
+
+            return new Date(year, month - 1, day, hours, minutes, seconds);
+        }
 
                 const imageUrl = convertDriveLink(item.File) || "placeholder.jpg";
 
