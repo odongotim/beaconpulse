@@ -119,7 +119,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             data.reverse().forEach(item => {
                 const imageUrl = convertDriveLink(item.File);
-                const dateTime = `${item.Date} ${item.Time}`;
+                const dateTime = item.Timestamp; // e.g., "2/19/2026 12:30:00"
+                card.dataset.time = dateTime;
 
                 const card = document.createElement("div");
                 card.className = "news-card";
@@ -157,10 +158,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ---------------- Convert Google Drive Links ----------------
     function convertDriveLink(url) {
-        if (!url) return "";
-        const idMatch = url.match(/id=([^&]+)/);
-        return idMatch ? `https://drive.google.com/uc?export=view&id=${idMatch[1]}` : url;
-    }
+    if (!url) return "";
+    const idMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/); // match /d/FILE_ID/
+    return idMatch ? `https://drive.google.com/uc?export=view&id=${idMatch[1]}` : url;
+}
+
 
     // ---------------- Search ----------------
     const searchInput = document.getElementById("searchInput");
