@@ -290,7 +290,7 @@ function closeNewsPopup() {
 
     window.scrollTo(0, scrollPosition); // return to where user was
 }
-const sheetURL = "https://opensheet.elk.sh/2PACX-1vTH9GuWuw9qcliOdPvNBFokmLW4E5jtK1WnkmkXKoac6VaNTOAxYHti-Xc1N2r40rlg5EXxiB-2BE_k/beaconpulse";
+const sheetURL = "https://opensheet.elk.sh/1hhE1DXSssZx58JdEpn6AXbroXcOiht0AcaDPlvvfe_U/beaconpulse";
 const container = document.querySelector(".news-container");
 
 async function loadNews() {
