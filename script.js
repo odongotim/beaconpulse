@@ -87,15 +87,17 @@ document.addEventListener("DOMContentLoaded", () => {
             const timeElement = card.querySelector(".time");
             if (timeElement) timeElement.textContent = "Posted " + getTimeAgo(card.dataset.time);
         });
+
         const alertSection = document.querySelector(".alert");
         if (alertSection) {
             const alertTime = alertSection.querySelector(".alert-time");
             if (alertTime) alertTime.textContent = getTimeAgo(alertSection.dataset.time);
         }
     }
+
     setInterval(updateTime, 60000);
 
-    // ---------------- Sort Posts ----------------
+    // ---------------- Sorting ----------------
     function sortPosts() {
         const container = document.querySelector(".news-container");
         if (!container) return;
@@ -105,16 +107,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ---------------- Google Sheets Fetch ----------------
-    const sheetURL = "https://opensheet.elk.sh/YOUR_SHEET_ID/News"; // <-- replace with your Sheet ID and tab
+    const sheetURL = "https://opensheet.elk.sh/1hhE1DXSssZx58JdEpn6AXbroXcOiht0AcaDPlvvfe_U/News"; // <-- your correct tab
     const container = document.querySelector(".news-container");
 
     async function loadNews() {
         try {
             const response = await fetch(sheetURL);
             const data = await response.json();
-            console.log("Fetched data:", data);
 
-            // Check if data is an array
+            console.log("Fetched data:", data); // Debug: check console
+
+            // Safely check if data is array
             const rows = Array.isArray(data) ? data : (Array.isArray(data.rows) ? data.rows : []);
             if (!rows.length) {
                 container.innerHTML = "<p>No news available yet.</p>";
@@ -125,6 +128,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             rows.reverse().forEach(item => {
                 const dateTime = item.Timestamp || new Date().toISOString();
+                const parsedDate = new Date(dateTime);
+                if (isNaN(parsedDate)) return;
+
                 const imageUrl = convertDriveLink(item.File) || "placeholder.jpg";
 
                 const card = document.createElement("div");
@@ -133,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 card.dataset.description = item["Full Description"] || "No Description";
                 card.dataset.image = imageUrl;
                 card.dataset.category = item.Category || "General";
-                card.dataset.time = new Date(dateTime).toISOString();
+                card.dataset.time = parsedDate.toISOString();
 
                 card.innerHTML = `
                     <img src="${imageUrl}" loading="lazy" alt="${item.Title || 'News'}">
@@ -141,6 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <p>${item.Headline || ''}</p>
                     <span class="time">Loading...</span>
                 `;
+
                 container.appendChild(card);
 
                 card.addEventListener("click", () => {
@@ -164,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     loadNews();
-    setInterval(loadNews, 60000);
+    setInterval(loadNews, 60000); // refresh every 1 min
 
     // ---------------- Search ----------------
     const searchInput = document.getElementById("searchInput");
@@ -236,6 +243,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <div class="ad-caption">${ad.caption}</div>`;
             return adItem;
         }
+
         ads.forEach(ad => adTrack.appendChild(createAd(ad)));
         ads.forEach(ad => adTrack.appendChild(createAd(ad)));
     }
