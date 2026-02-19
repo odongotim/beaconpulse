@@ -11,66 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // ---------------- Sort Posts by Newest ----------------
-    function sortPosts() {
-        const container = document.querySelector(".news-container");
-        if (!container) return;
-
-        const posts = Array.from(container.querySelectorAll(".news-card"));
-        posts.sort((a, b) => new Date(b.dataset.time) - new Date(a.dataset.time));
-        posts.forEach(post => container.appendChild(post));
-    }
-
-    // ---------------- Time Ago ----------------
-    function getTimeAgo(dateString) {
-    const now = new Date();
-    const postTime = new Date(dateString);
-    const diffMs = now - postTime;
-
-    const minutes = Math.floor(diffMs / (1000 * 60));
-    const hours = Math.floor(diffMs / (1000 * 60 * 60));
-    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    const weeks = Math.floor(days / 7);
-    const months = Math.floor(weeks / 4);
-    const years = Math.floor(months / 12);
-
-    if (minutes < 60) {
-        return minutes <= 1 ? "1 minute ago" : `${minutes} minutes ago`;
-    }
-
-    if (hours < 24) {
-        return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
-    }
-
-    if (days < 7) {
-        return days === 1 ? "1 day ago" : `${days} days ago`;
-    }
-
-    if (weeks < 4) {
-        return weeks === 1 ? "1 week ago" : `${weeks} weeks ago`;
-    }
-
-    if (months < 12) {
-        return months === 1 ? "1 month ago" : `${months} months ago`;
-    }
-    
-    return years === 1 ? "1 year ago" : `${years} years ago`;
-}
-
-
-    function updateTime() {
-        document.querySelectorAll(".news-card").forEach(card => {
-            const timeElement = card.querySelector(".time");
-            if (timeElement) timeElement.textContent = "Posted " + getTimeAgo(card.dataset.time);
-        });
-
-        const alertSection = document.querySelector(".alert");
-        if (alertSection) {
-            const alertTime = alertSection.querySelector(".alert-time");
-            if (alertTime) alertTime.textContent = getTimeAgo(alertSection.dataset.time);
-        }
-    }
-
     // ---------------- Modal ----------------
     const modal = document.getElementById("newsModal");
     const modalTitle = document.getElementById("modalTitle");
@@ -78,8 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalImage = document.getElementById("modalImage");
     const modalVideo = document.getElementById("modalVideo");
     const closeBtn = document.querySelector(".close");
-
     let savedScrollPosition = 0;
+
     function openModal(title, description, imageSrc = null, videoSrc = null) {
         savedScrollPosition = window.scrollY;
         modalTitle.textContent = title;
@@ -107,11 +47,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function closeModal() {
         modal.style.display = "none";
-
         document.body.style.position = "";
         document.body.style.top = "";
-
-    window.scrollTo(0, savedScrollPosition);
+        window.scrollTo(0, savedScrollPosition);
 
         if (modalVideo) {
             modalVideo.pause();
@@ -121,30 +59,113 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (closeBtn) closeBtn.addEventListener("click", closeModal);
     window.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
 
-    // Open modal for news cards
-    document.querySelectorAll(".news-card").forEach(card => {
-        card.addEventListener("click", () => {
-            openModal(card.dataset.title, card.dataset.description, card.dataset.image, card.dataset.video);
-        });
-    });
+    // ---------------- Time Ago ----------------
+    function getTimeAgo(dateString) {
+        const now = new Date();
+        const postTime = new Date(dateString);
+        const diffMs = now - postTime;
 
-    // Open modal for alert
-    const alertSection = document.querySelector(".alert");
-    if (alertSection) {
-        alertSection.addEventListener("click", () => {
-            openModal(alertSection.dataset.title, alertSection.dataset.description, alertSection.dataset.image);
-        });
+        const minutes = Math.floor(diffMs / (1000 * 60));
+        const hours = Math.floor(diffMs / (1000 * 60 * 60));
+        const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        const weeks = Math.floor(days / 7);
+        const months = Math.floor(weeks / 4);
+        const years = Math.floor(months / 12);
+
+        if (minutes < 60) return minutes <= 1 ? "1 minute ago" : `${minutes} minutes ago`;
+        if (hours < 24) return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
+        if (days < 7) return days === 1 ? "1 day ago" : `${days} days ago`;
+        if (weeks < 4) return weeks === 1 ? "1 week ago" : `${weeks} weeks ago`;
+        if (months < 12) return months === 1 ? "1 month ago" : `${months} months ago`;
+        return years === 1 ? "1 year ago" : `${years} years ago`;
     }
 
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") closeModal();
-    });
+    function updateTime() {
+        document.querySelectorAll(".news-card").forEach(card => {
+            const timeElement = card.querySelector(".time");
+            if (timeElement) timeElement.textContent = "Posted " + getTimeAgo(card.dataset.time);
+        });
 
+        const alertSection = document.querySelector(".alert");
+        if (alertSection) {
+            const alertTime = alertSection.querySelector(".alert-time");
+            if (alertTime) alertTime.textContent = getTimeAgo(alertSection.dataset.time);
+        }
+    }
+
+    setInterval(updateTime, 60000); // update every 1 minute
+
+    // ---------------- Sorting ----------------
+    function sortPosts() {
+        const container = document.querySelector(".news-container");
+        if (!container) return;
+
+        const posts = Array.from(container.querySelectorAll(".news-card"));
+        posts.sort((a, b) => new Date(b.dataset.time) - new Date(a.dataset.time));
+        posts.forEach(post => container.appendChild(post));
+    }
+
+    // ---------------- Google Sheets Fetch ----------------
+    const sheetURL = "https://opensheet.elk.sh/1hhE1DXSssZx58JdEpn6AXbroXcOiht0AcaDPlvvfe_U/beaconpulse";
+    const container = document.querySelector(".news-container");
+
+    async function loadNews() {
+        try {
+            const response = await fetch(sheetURL);
+            const data = await response.json();
+            container.innerHTML = "";
+
+            data.reverse().forEach(item => {
+                const imageUrl = convertDriveLink(item.File);
+                const dateTime = `${item.Date} ${item.Time}`;
+
+                const card = document.createElement("div");
+                card.className = "news-card";
+                card.dataset.title = item.Title;
+                card.dataset.description = item["Full Description"];
+                card.dataset.image = imageUrl;
+                card.dataset.category = item.Category;
+                card.dataset.time = dateTime;
+
+                card.innerHTML = `
+                    <img src="${imageUrl}" loading="lazy">
+                    <h3>${item.Title}</h3>
+                    <p>${item.Headline}</p>
+                    <span class="time">Loading...</span>
+                `;
+
+                container.appendChild(card);
+
+                // Add click event for modal
+                card.addEventListener("click", () => {
+                    openModal(card.dataset.title, card.dataset.description, card.dataset.image);
+                });
+            });
+
+            sortPosts();
+            updateTime();
+
+        } catch (error) {
+            console.error("Failed to load news:", error);
+        }
+    }
+
+    loadNews();
+    setInterval(loadNews, 300000); // auto-refresh every 5 minutes
+
+    // ---------------- Convert Google Drive Links ----------------
+    function convertDriveLink(url) {
+        if (!url) return "";
+        const idMatch = url.match(/id=([^&]+)/);
+        return idMatch ? `https://drive.google.com/uc?export=view&id=${idMatch[1]}` : url;
+    }
 
     // ---------------- Search ----------------
     const searchInput = document.getElementById("searchInput");
     const searchBtn = document.getElementById("searchBtn");
+    const alertSection = document.querySelector(".alert");
 
     function filterPosts() {
         if (!searchInput) return;
@@ -170,10 +191,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const navLinks = document.querySelectorAll(".nav-links a");
 
     navLinks.forEach(link => {
-        link.addEventListener("click", function(e) {
+        link.addEventListener("click", function (e) {
             const category = this.dataset.category || this.textContent.trim();
-
-            // Skip "Submit Tip"
             if (this.classList.contains("btn-submit")) return;
 
             e.preventDefault();
@@ -182,11 +201,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 card.style.display = (category === "All" || card.dataset.category === category) ? "block" : "none";
             });
 
-            // Highlight active link
             navLinks.forEach(l => l.classList.remove("active"));
             this.classList.add("active");
 
-            // Close hamburger menu on mobile
             if (window.innerWidth < 768 && hamburger && navLinksContainer) {
                 navLinksContainer.classList.remove("active");
                 hamburger.classList.remove("toggle");
@@ -194,159 +211,33 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // ---------------- Initial Setup ----------------
-    sortPosts();
-    updateTime();
-    setInterval(updateTime, 60000);
-});
-// ---------------- Advertisement Slideshow ----------------
+    // ---------------- Advertisement Slideshow ----------------
+    const ads = [
+        { image: "screen.jfif", link: "", caption: "For affordable screen replacement and repair reach to Staurt Enterprises or call 0760638570", badge: "Hotest Deal" },
+        { image: "rody.jpeg", link: "", caption: "Special Discount – 30% Off!", badge: "Sponsored" },
+        { image: "staurt.jpeg", link: "", caption: "New Tech Devices Available Now!", badge: "Breaking Deal" },
+        { image: "sport.jpg", link: "", caption: "Join Our Sports Academy Today!", badge: "Sports" },
+        { image: "lotty.jfif", link: "", caption: "Lotyang Innocent Olum For Guild", badge: "Politics" },
+        { image: "pc.jfif", link: "", caption: "🔥 Affordable laptops for students 🔥 👉For more details and consultation message or call 0701371126, 0765013616", badge: "Breaking Deal" },
+        { image: "laundry.jfif", link: "", caption: "Start the new semester with sparkling laundry. Ens Laundry is here for you.", badge: "New" }
+    ];
 
-const ads = [
-    {
-        image: "screen.jfif",
-        link: "",
-        caption: "For affordable screen replacement and repair reach to Staurt Enterprises or call 0760638570",
-        badge: "Hotest Deal"
-    },
-    {
-        image: "rody.jpeg",
-        link: "",
-        caption: "Special Discount – 30% Off!",
-        badge: "Sponsored"
-    },
-    {
-        image: "staurt.jpeg",
-        link: "",
-        caption: "New Tech Devices Available Now!",
-        badge: "Breaking Deal"
-    },
-    {
-        image: "sport.jpg",
-        link: "",
-        caption: "Join Our Sports Academy Today!",
-        badge: "Sports"
-    },
-    {
-        image: "lotty.jfif",
-        link: "",
-        caption: "Lotyang Innocent Olum For Guild",
-        badge: "Politics"
-    },
-    {
-        image: "pc.jfif",
-        link: "",
-        caption: "🔥 Affordable laptops for students 🔥 👉For more details and consultation  message or call 0701371126, 0765013616",
-        badge: "Breaking Deal"
-    },
-    {
-        image: "laundry.jfif",
-        link: "",
-        caption: "Start the new semester with sparkling laundry. Ens Laundry is here for you.",
-        badge: "New"
-    }
-];
+    const adTrack = document.getElementById("adTrack");
+    if (adTrack) {
+        function createAd(ad) {
+            const adItem = document.createElement("a");
+            adItem.href = ad.link;
+            adItem.target = "_blank";
+            adItem.className = "ad-item";
+            adItem.innerHTML = `<span class="ad-badge">${ad.badge}</span>
+                                <img src="${ad.image}" loading="lazy">
+                                <div class="ad-caption">${ad.caption}</div>`;
+            return adItem;
+        }
 
-const adTrack = document.getElementById("adTrack");
-
-if (adTrack) {
-
-    function createAd(ad) {
-        const adItem = document.createElement("a");
-        adItem.href = ad.link;
-        adItem.target = "_blank";
-        adItem.className = "ad-item";
-
-        adItem.innerHTML = `
-            <span class="ad-badge">${ad.badge}</span>
-            <img src="${ad.image}" loading="lazy">
-            <div class="ad-caption">${ad.caption}</div>
-        `;
-
-        return adItem;
+        // Add ads twice for seamless infinite scroll
+        ads.forEach(ad => adTrack.appendChild(createAd(ad)));
+        ads.forEach(ad => adTrack.appendChild(createAd(ad)));
     }
 
-    // Add ads twice for seamless infinite scroll
-    ads.forEach(ad => adTrack.appendChild(createAd(ad)));
-    ads.forEach(ad => adTrack.appendChild(createAd(ad)));
-}
-
-let scrollPosition = 0;
-
-function openNewsPopup(content) {
-    scrollPosition = window.scrollY; // save position
-    
-    document.getElementById("newsPopup").classList.add("active");
-
-    // Optional: prevent background scroll
-    document.body.style.top = `-${scrollPosition}px`;
-    document.body.style.position = "fixed";
-}
-
-function closeNewsPopup() {
-    document.getElementById("newsPopup").classList.remove("active");
-
-    document.body.style.position = "";
-    document.body.style.top = "";
-
-    window.scrollTo(0, scrollPosition); // return to where user was
-}
-
-const sheetURL = "https://opensheet.elk.sh/1hhE1DXSssZx58JdEpn6AXbroXcOiht0AcaDPlvvfe_U/Form%20Responses%201";
-
-const container = document.querySelector(".news-container");
-
-async function loadNews() {
-    const response = await fetch(sheetURL);
-    const data = await response.json();
-
-    container.innerHTML = "";
-
-    data.reverse().forEach(item => {
-
-        const imageUrl = convertDriveLink(item.File);
-
-        const card = document.createElement("div");
-        card.className = "news-card";
-
-        // Use Date + Time combined
-        const dateTime = `${item.Date} ${item.Time}`;
-
-        card.dataset.title = item.Title;
-        card.dataset.description = item["Full Description"];
-        card.dataset.image = imageUrl;
-        card.dataset.category = item.Category;
-        card.dataset.time = dateTime;
-
-        card.innerHTML = `
-            <img src="${imageUrl}" loading="lazy">
-            <h3>${item.Title}</h3>
-            <p>${item.Headline}</p>
-            <span class="time">Loading...</span>
-        `;
-
-        container.appendChild(card);
-    });
-
-    updateTime(); // your existing time ago function
-}
-
-loadNews();
-
-
-function convertDriveLink(url) {
-    if (!url) return "";
-    const idMatch = url.match(/id=([^&]+)/);
-    return idMatch 
-        ? `https://drive.google.com/uc?export=view&id=${idMatch[1]}`
-        : url;
-}
-
-document.querySelectorAll(".news-card").forEach(card => {
-    card.addEventListener("click", () => {
-        openModal(
-            card.dataset.title,
-            card.dataset.description,
-            card.dataset.image
-        );
-    });
 });
