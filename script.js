@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-
     const sheetURL = "https://opensheet.elk.sh/1hhE1DXSssZx58JdEpn6AXbroXcOiht0AcaDPlvvfe_U/news";
     const container = document.querySelector(".news-container");
 
@@ -16,14 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return new Date(year, month - 1, day, hours || 0, minutes || 0, seconds || 0);
     }
 
-    function openModal(title, description, image) {
-        document.getElementById("modalTitle").textContent = title;
-        document.getElementById("modalDescription").textContent = description;
-        document.getElementById("modalImage").src = image;
-
-        document.getElementById("newsModal").style.display = "block";
-    }
-
     // ---------------- Convert Drive Links ----------------
     function convertDriveLink(url) {
         if (!url) return "placeholder.jpg";
@@ -33,9 +24,37 @@ document.addEventListener("DOMContentLoaded", () => {
             url.match(/id=([a-zA-Z0-9_-]+)/);
 
         return idMatch
-            ? `https://drive.google.com/uc?export=view&id=1YUD4voPyx8IEQlG7Q6vqwdI5sNl0YMM_`
+            ? `https://drive.google.com/uc?export=view&id=1DYNhujg_GRp3gx3i0TA3NFj2oHIY4XIS`
             : url;
     }
+
+    // ---------------- Modal Function ----------------
+    const modal = document.getElementById("newsModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalDescription = document.getElementById("modalDescription");
+    const modalImage = document.getElementById("modalImage");
+
+    function openModal(title, description, image) {
+        modalTitle.textContent = title;
+        modalDescription.textContent = description;
+        if (image) {
+            modalImage.src = image;
+            modalImage.style.display = "block";
+        } else {
+            modalImage.style.display = "none";
+        }
+        modal.style.display = "block";
+    }
+
+    // Close modal on "x"
+    document.querySelector(".close").addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener("click", (e) => {
+        if (e.target === modal) modal.style.display = "none";
+    });
 
     // ---------------- Load News ----------------
     async function loadNews() {
@@ -45,17 +64,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         try {
-            console.log("Loading news...");
-
             const response = await fetch(sheetURL);
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
             const data = await response.json();
-            console.log("Fetched data:", data);
-
             if (!Array.isArray(data) || data.length === 0) {
                 container.innerHTML = "<p>No news available.</p>";
                 return;
@@ -63,7 +75,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             container.innerHTML = "";
 
-            // Display newest first
             data.reverse().forEach(item => {
                 const parsedDate = parseUgandaTimestamp(item.Timestamp);
                 const imageUrl = convertDriveLink(item.File);
@@ -73,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 card.dataset.time = parsedDate.toISOString();
                 card.dataset.title = item.Title || "No Title";
                 card.dataset.description = item["Full Description"] || "";
-                card.dataset.category = item.Category || "General";
+                card.dataset.image = imageUrl;
 
                 card.innerHTML = `
                     <img src="${imageUrl}" alt="${item.Title || "News"}">
@@ -81,6 +92,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     <p>${item.Headline || ""}</p>
                     <span class="time">${parsedDate.toLocaleString()}</span>
                 `;
+
+                // Add click event to open modal
+                card.addEventListener("click", () => {
+                    openModal(card.dataset.title, card.dataset.description, card.dataset.image);
+                });
 
                 container.appendChild(card);
             });
@@ -102,7 +118,6 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
 
     const adTrack = document.getElementById("adTrack");
-
     if (adTrack) {
         ads.forEach(ad => {
             const adItem = document.createElement("div");
@@ -114,13 +129,4 @@ document.addEventListener("DOMContentLoaded", () => {
             adTrack.appendChild(adItem);
         });
     }
-
 });
-
-    function openModal(title, description, image) {
-        document.getElementById("modalTitle").textContent = title;
-        document.getElementById("modalDescription").textContent = description;
-        document.getElementById("modalImage").src = image;
-
-        document.getElementById("newsModal").style.display = "block";
-    }
