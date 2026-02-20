@@ -5,30 +5,24 @@ document.addEventListener("DOMContentLoaded", () => {
     // ---------------- Timestamp Parser ----------------
     function parseUgandaTimestamp(timestamp) {
         if (!timestamp) return new Date();
-
         const [datePart, timePart] = timestamp.split(" ");
-        if (!datePart || !timePart) return new Date();
-
         const [day, month, year] = datePart.split("/");
-        const [hours, minutes, seconds] = timePart.split(":");
-
+        const [hours, minutes, seconds] = (timePart || "").split(":");
         return new Date(year, month - 1, day, hours || 0, minutes || 0, seconds || 0);
     }
 
     // ---------------- Convert Drive Links ----------------
     function convertDriveLink(url) {
         if (!url) return "placeholder.jpg";
-
         const idMatch =
             url.match(/\/d\/([a-zA-Z0-9_-]+)/) ||
             url.match(/id=([a-zA-Z0-9_-]+)/);
-
         return idMatch
-            ? `https://drive.google.com/uc?export=view&id=1DYNhujg_GRp3gx3i0TA3NFj2oHIY4XIS`
+            ? `https://drive.google.com/uc?export=view&id=${idMatch[1]}`
             : url;
     }
 
-    // ---------------- Modal Function ----------------
+    // ---------------- Modal ----------------
     const modal = document.getElementById("newsModal");
     const modalTitle = document.getElementById("modalTitle");
     const modalDescription = document.getElementById("modalDescription");
@@ -46,27 +40,21 @@ document.addEventListener("DOMContentLoaded", () => {
         modal.style.display = "block";
     }
 
-    // Close modal on "x"
     document.querySelector(".close").addEventListener("click", () => {
         modal.style.display = "none";
     });
 
-    // Close modal when clicking outside
     window.addEventListener("click", (e) => {
         if (e.target === modal) modal.style.display = "none";
     });
 
     // ---------------- Load News ----------------
     async function loadNews() {
-        if (!container) {
-            console.error("No .news-container found in HTML");
-            return;
-        }
+        if (!container) return console.error("No .news-container found");
 
         try {
             const response = await fetch(sheetURL);
-            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const data = await response.json();
             if (!Array.isArray(data) || data.length === 0) {
                 container.innerHTML = "<p>No news available.</p>";
@@ -81,7 +69,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const card = document.createElement("div");
                 card.className = "news-card";
-                card.dataset.time = parsedDate.toISOString();
                 card.dataset.title = item.Title || "No Title";
                 card.dataset.description = item["Full Description"] || "";
                 card.dataset.image = imageUrl;
@@ -93,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <span class="time">${parsedDate.toLocaleString()}</span>
                 `;
 
-                // Add click event to open modal
+                // Event listener for modal
                 card.addEventListener("click", () => {
                     openModal(card.dataset.title, card.dataset.description, card.dataset.image);
                 });
@@ -101,15 +88,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 container.appendChild(card);
             });
 
-        } catch (error) {
-            console.error("Failed to load news:", error);
+        } catch (err) {
+            console.error("Failed to load news:", err);
             container.innerHTML = "<p>Error loading news.</p>";
         }
     }
 
     loadNews();
 
-    // ---------------- Advertisement ----------------
+    // ---------------- Ads ----------------
     const ads = [
         { image: "screen.jfif", caption: "Screen replacement & repair – 0760638570" },
         { image: "rody.jpeg", caption: "Special Discount – 30% Off!" },
