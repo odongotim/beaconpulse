@@ -354,9 +354,9 @@ footer {
     margin: 10% auto;
     padding: 20px;
     width: 90%;
-    max-width: 600px;
+    max-width: 500px;
     max-height: 80vh;
-    border-radius: 8px;
+    border-radius: 10px;
     position: relative;
     overflow-y: auto;
 }
@@ -464,7 +464,7 @@ footer {
 .ad-item img {
     max-width: 100%;
     max-height: 100%;
-    object-fit: contain;        /* shows full image */
+    object-fit: cover;        /* shows full image */
     display: block;
 }
 
@@ -491,6 +491,7 @@ footer {
     padding: 8px;
     font-size: 13px;
     text-align: center;
+    z-index: 10;
 }
 
 .ad-container:hover .ad-track {

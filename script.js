@@ -123,14 +123,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const adTrack = document.getElementById("adTrack");
     if (adTrack) {
-        ads.forEach(ad => {
-            const adItem = document.createElement("div");
-            adItem.className = "ad-item";
-            adItem.innerHTML = `
-                <img src="${ad.image}" alt="Ad">
-                <div>${ad.caption}</div>
-            `;
-            adTrack.appendChild(adItem);
-        });
+
+    function createAd(ad) {
+        const adItem = document.createElement("a");
+        adItem.href = ad.link;
+        adItem.target = "_blank";
+        adItem.className = "ad-item";
+
+        adItem.innerHTML = `
+            <span class="ad-badge">${ad.badge}</span>
+            <img src="${ad.image}" loading="lazy">
+            <div class="ad-caption">${ad.caption}</div>
+        `;
+
+        return adItem;
     }
+
+    // Add ads twice for seamless infinite scroll
+    ads.forEach(ad => adTrack.appendChild(createAd(ad)));
+    ads.forEach(ad => adTrack.appendChild(createAd(ad)));
+}
 });
