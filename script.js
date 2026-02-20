@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
             url.match(/id=([a-zA-Z0-9_-]+)/);
 
         return idMatch
-            ? `https://drive.google.com/uc?export=view&id=${idMatch[1]}`
+            ? `https://drive.google.com/uc?export=view&id=1YUD4voPyx8IEQlG7Q6vqwdI5sNl0YMM_`
             : url;
     }
 
