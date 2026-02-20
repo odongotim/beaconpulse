@@ -16,6 +16,14 @@ document.addEventListener("DOMContentLoaded", () => {
         return new Date(year, month - 1, day, hours || 0, minutes || 0, seconds || 0);
     }
 
+    function openModal(title, description, image) {
+        document.getElementById("modalTitle").textContent = title;
+        document.getElementById("modalDescription").textContent = description;
+        document.getElementById("modalImage").src = image;
+
+        document.getElementById("newsModal").style.display = "block";
+    }
+
     // ---------------- Convert Drive Links ----------------
     function convertDriveLink(url) {
         if (!url) return "placeholder.jpg";
