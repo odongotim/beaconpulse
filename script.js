@@ -116,3 +116,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 });
+
+    function openModal(title, description, image) {
+        document.getElementById("modalTitle").textContent = title;
+        document.getElementById("modalDescription").textContent = description;
+        document.getElementById("modalImage").src = image;
+
+        document.getElementById("newsModal").style.display = "block";
+    }
