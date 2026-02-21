@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 card.dataset.image = imageUrl;
 
                 card.innerHTML = `
-                    <img src="${imageUrl}" alt="${item.Title || "News"}">
+                    <img src="${item.image_url}" alt="${item.Title || "News"}">
                     <h3>${item.Title || "No Title"}</h3>
                     <p>${item.Headline || ""}</p>
                     <span class="time">${timeAgo(parsedDate)}</span>
@@ -106,10 +106,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ---------------- Ads ----------------
     const ads = [
-        { image: "screen.jfif", caption: "Screen replacement & repair – 0760638570" },
-        { image: "rody.jpeg", caption: "Special Discount – 30% Off!" },
-        { image: "staurt.jpeg", caption: "New Tech Devices Available Now!" },
-        { image: "sport.jpg", caption: "Join Our Sports Academy Today!" }
+        { image: "screen.jfif", caption: "Screen replacement & repair – 0760638570", badge:"Electronics" },
+        { image: "rody.jpeg", caption: "Special Discount – 30% Off!", badge:"Entertainment" },
+        { image: "staurt.jpeg", caption: "New Tech Devices Available Now!", badge:"Electronics" },
+        { image: "sport.jpg", caption: "Join Our Sports Academy Today!", badge:"Sports" }
     ];
 
     const adTrack = document.getElementById("adTrack");
