@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const sheetURL = "https://opensheet.elk.sh/1hhE1DXSssZx58JdEpn6AXbroXcOiht0AcaDPlvvfe_U/news";
+    const sheetURL = "https://opensheet.elk.sh/2PACX-1vTH9GuWuw9qcliOdPvNBFokmLW4E5jtK1WnkmkXKoac6VaNTOAxYHti-Xc1N2r40rlg5EXxiB-2BE_k/news";
     const container = document.querySelector(".news-container");
 
     // ---------------- Timestamp Parser ----------------
@@ -82,12 +82,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             data.reverse().forEach(item => {
                 const parsedDate = parseUgandaTimestamp(item.Timestamp);
-                const imageUrl = convertDriveLink(item.File);
+                const imageUrl = convertDriveLink(item.image_url);
 
                 const card = document.createElement("div");
                 card.className = "news-card";
                 card.dataset.title = item.Title || "No Title";
-                card.dataset.description = item["Full Description"] || "";
+                card.dataset.description = item["description"] || "";
                 card.dataset.image = imageUrl;
 
                 card.innerHTML = `
