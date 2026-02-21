@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const sheetURL = "https://opensheet.elk.sh/2PACX-1vTH9GuWuw9qcliOdPvNBFokmLW4E5jtK1WnkmkXKoac6VaNTOAxYHti-Xc1N2r40rlg5EXxiB-2BE_k/news";
+    const sheetURL = "https://opensheet.elk.sh/1hhE1DXSssZx58JdEpn6AXbroXcOiht0AcaDPlvvfe_U/news";
     const container = document.querySelector(".news-container");
 
     // ---------------- Timestamp Parser ----------------
