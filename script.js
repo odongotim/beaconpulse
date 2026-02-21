@@ -129,4 +129,33 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     loadNews();
+    const ads = [
+        { image: "screen.jfif", caption: "Screen replacement & repair – 0760638570", badge:"Electronics" },
+        { image: "rody.jpeg", caption: "Special Discount – 30% Off!", badge:"Entertainment" },
+        { image: "staurt.jpeg", caption: "New Tech Devices Available Now!", badge:"Electronics" },
+        { image: "sport.jpg", caption: "Join Our Sports Academy Today!", badge:"Sports" }
+    ];
+
+    const adTrack = document.getElementById("adTrack");
+    if (adTrack) {
+
+    function createAd(ad) {
+        const adItem = document.createElement("a");
+        adItem.href = ad.link;
+        adItem.target = "_blank";
+        adItem.className = "ad-item";
+
+        adItem.innerHTML = `
+            <span class="ad-badge">${ad.badge}</span>
+            <img src="${ad.image}" loading="lazy">
+            <div class="ad-caption">${ad.caption}</div>
+        `;
+
+        return adItem;
+    }
+
+    // Add ads twice for seamless infinite scroll
+    ads.forEach(ad => adTrack.appendChild(createAd(ad)));
+    ads.forEach(ad => adTrack.appendChild(createAd(ad)));
+}
 });
