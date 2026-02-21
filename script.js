@@ -2,6 +2,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const sheetURL = "https://opensheet.elk.sh/1hhE1DXSssZx58JdEpn6AXbroXcOiht0AcaDPlvvfe_U/news";
     const container = document.querySelector(".news-container");
 
+    const hamburger = document.getElementById("hamburger");
+    const navLinksContainer = document.getElementById("nav-links");
+
+    if (hamburger && navLinksContainer) {
+        hamburger.addEventListener("click", () => {
+            alert("clicked")
+            navLinksContainer.classList.toggle("active");
+            hamburger.classList.toggle("toggle");
+        });
+    }
+
     // ---------------- Timestamp Parser ----------------
     function parseUgandaTimestamp(timestamp) {
         if (!timestamp) return new Date();
@@ -42,17 +53,22 @@ document.addEventListener("DOMContentLoaded", () => {
     const now = new Date();
     const seconds = Math.floor((now - date) / 1000);
 
-    if (seconds < 60) return `${seconds} seconds ago`;
+    if (seconds < 60) return `Posted ${seconds} seconds ago`;
+
     const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes} minutes ago`;
+    if (minutes < 60) return `Posted ${minutes} ${minutes === 1 ? "minute" : "minutes"} ago`;
+
     const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours} hours ago`;
+    if (hours < 24) return `Posted ${hours} ${hours === 1 ? "hour" : "hours"} ago`;
+
     const days = Math.floor(hours / 24);
-    if (days < 30) return `${days} days ago`;
+    if (days < 30) return `Posted ${days} ${days === 1 ? "day" : "days"} ago`;
+
     const months = Math.floor(days / 30);
-    if (months < 12) return `${months} months ago`;
+    if (months < 12) return `Posted ${months} ${months === 1 ? "month" : "months"} ago`;
+
     const years = Math.floor(months / 12);
-    return `${years} years ago`;
+    return `Posted ${years} ${years === 1 ? "year" : "years"} ago`;
 }
 
     // ---------------- Load News ----------------
@@ -73,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             data.reverse().forEach(item => {
                 const parsedDate = parseUgandaTimestamp(item.Timestamp);
-                const imageUrl = item["Image Link"];
+                const imageUrl = item["Filename"];
 
                 const card = document.createElement("div");
                 card.className = "news-card";
@@ -82,7 +98,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 card.dataset.image = imageUrl;
 
                 card.innerHTML = `
-                    <img src="${item.image_url}" alt="${item.Title || "News"}">
+                    <span class="category">${item.Category || "General"}</span>
+                    <img src="${item.Filename}" alt="${item.Title || "News"}">
                     <h3>${item.Title || "No Title"}</h3>
                     <p>${item.Headline || ""}</p>
                     <span class="time">${timeAgo(parsedDate)}</span>

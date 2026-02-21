@@ -79,6 +79,8 @@
     display: none;
     flex-direction: column;
     cursor: pointer;
+    z-index: 9999;
+    position: relative;
 }
 
 .hamburger span {
@@ -292,11 +294,14 @@ input:invalid:focus {
     margin: auto;
 }
 .news-card {
-    background: white;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-    transition: 0.3s ease;
+    display: flex;
+    flex-direction: column;   /* stack vertically */
+    justify-content: space-between; /* push bottom element down */
+    height: 100%; /* important */
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    padding: 12px;
 }
 
 .news-card img {
@@ -330,6 +335,7 @@ input:invalid:focus {
     border-radius: 12px;
     font-size: 11px;
     margin-bottom: 8px;
+    width: fit-content;
 }
 
 .news-card small {
@@ -518,4 +524,9 @@ footer {
     100% {
         transform: translateX(-50%);
     }
+}
+.time {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #777;
 }
