@@ -57,6 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ---------------- Load News ----------------
     async function loadNews() {
+        const container = document.querySelector(".news-container");
         if (!container) return console.error("No .news-container found");
 
         try {
