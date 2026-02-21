@@ -12,9 +12,9 @@
     padding: 1rem 5%;
     background-color: #002347; 
     color: white;
-    position: sticky;
+    position: relative;
     top: 0;
-    z-index: 1000;
+    z-index: 10000;
 }
 
 .nav-container {
@@ -79,7 +79,7 @@
     display: none;
     flex-direction: column;
     cursor: pointer;
-    z-index: 9999;
+    z-index: 10001;
     position: relative;
 }
 
@@ -529,4 +529,28 @@ footer {
     margin-top: 10px;
     font-size: 12px;
     color: #777;
+}
+#categoryTabs {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding: 5px 0;
+}
+.tab-btn {
+    flex: 0 0 auto;
+    padding: 5px 10px;
+    border: none;
+    background: #eee;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.tab-btn.active {
+    background: #007bff;
+    color: #fff;
+}
+
+/* Hamburger scrollable */
+#nav-links.active {
+    max-height: 70vh;
+    overflow-y: auto;
 }
