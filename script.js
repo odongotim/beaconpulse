@@ -72,33 +72,29 @@ document.addEventListener("DOMContentLoaded", () => {
             container.innerHTML = "";
 
             data.reverse().forEach(item => {
-                const parsedDate = parseUgandaTimestamp(item.timestamp);
-                const imageUrl = item.File; // IMPORTANT: match exact sheet header
-                console.log("IMAGE URL", item.File);
+                const parsedDate = parseUgandaTimestamp(item.Timestamp);
+                const imageUrl = item["Image Link"];
+
                 const card = document.createElement("div");
                 card.className = "news-card";
-
-                card.dataset.title = item.title || "No Title";
-                card.dataset.description = item.description || "";
+                card.dataset.title = item.Title || "No Title";
+                card.dataset.description = item["Full Description"] || "";
                 card.dataset.image = imageUrl;
 
                 card.innerHTML = `
-                ${imageUrl ? `<img src="${imageUrl}" alt="${item.title || "News"}">` : ""}
-                <h3>${item.title || "No Title"}</h3>
-                <p>${item.headline || ""}</p>
-                <span class="time">${timeAgo(parsedDate)}</span>
+                    <img src="${item.image_url}" alt="${item.Title || "News"}">
+                    <h3>${item.Title || "No Title"}</h3>
+                    <p>${item.Headline || ""}</p>
+                    <span class="time">${timeAgo(parsedDate)}</span>
                 `;
 
+                // Event listener for modal
                 card.addEventListener("click", () => {
-                     openModal(
-                    card.dataset.title,
-                    card.dataset.description,
-                    card.dataset.image
-                );
-            });
+                    openModal(card.dataset.title, card.dataset.description, card.dataset.image);
+                });
 
-    container.appendChild(card);
-});
+                container.appendChild(card);
+            });
 
         } catch (err) {
             console.error("Failed to load news:", err);
