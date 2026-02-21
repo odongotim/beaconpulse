@@ -3,8 +3,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const container = document.querySelector(".news-container");
     const hamburger = document.getElementById("hamburger");
     const navLinksContainer = document.getElementById("nav-links");
+    const tabsContainer = document.getElementById("categoryTabs");
 
-    // ---------------- Hamburger ----------------
+    let allNews = []; // store all news for filtering
+
+    // Hamburger toggle
     if (hamburger && navLinksContainer) {
         hamburger.addEventListener("click", () => {
             navLinksContainer.classList.toggle("active");
@@ -12,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // ---------------- Timestamp Parser ----------------
+    // Timestamp parser
     function parseUgandaTimestamp(timestamp) {
         if (!timestamp) return new Date();
         const [datePart, timePart] = timestamp.split(" ");
@@ -21,28 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return new Date(year, month - 1, day, hours || 0, minutes || 0, seconds || 0);
     }
 
-    // ---------------- Modal ----------------
-    const modal = document.getElementById("newsModal");
-    const modalTitle = document.getElementById("modalTitle");
-    const modalDescription = document.getElementById("modalDescription");
-    const modalImage = document.getElementById("modalImage");
-
-    function openModal(title, description, image) {
-        modalTitle.textContent = title;
-        modalDescription.textContent = description;
-        if (image) {
-            modalImage.src = image;
-            modalImage.style.display = "block";
-        } else {
-            modalImage.style.display = "none";
-        }
-        modal.style.display = "flex"; // make it flexible for mobile
-    }
-
-    document.querySelector(".close").addEventListener("click", () => modal.style.display = "none");
-    window.addEventListener("click", e => { if(e.target===modal) modal.style.display="none"; });
-
-    // ---------------- Time Ago ----------------
+    // Time ago
     function timeAgo(date) {
         const now = new Date();
         const seconds = Math.floor((now - date) / 1000);
@@ -59,7 +41,28 @@ document.addEventListener("DOMContentLoaded", () => {
         return `Posted ${years} ${years===1?"year":"years"} ago`;
     }
 
-    // ---------------- Load News ----------------
+    // Modal
+    const modal = document.getElementById("newsModal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalDescription = document.getElementById("modalDescription");
+    const modalImage = document.getElementById("modalImage");
+
+    function openModal(title, description, image) {
+        modalTitle.textContent = title;
+        modalDescription.textContent = description;
+        if (image) {
+            modalImage.src = image;
+            modalImage.style.display = "block";
+        } else {
+            modalImage.style.display = "none";
+        }
+        modal.style.display = "flex";
+    }
+
+    document.querySelector(".close").addEventListener("click", () => modal.style.display = "none");
+    window.addEventListener("click", e => { if(e.target===modal) modal.style.display="none"; });
+
+    // Load news
     async function loadNews() {
         if(!container) return console.error("No .news-container found");
         try {
@@ -67,56 +70,63 @@ document.addEventListener("DOMContentLoaded", () => {
             if(!response.ok) throw new Error(`HTTP ${response.status}`);
             const data = await response.json();
             if(!Array.isArray(data) || data.length===0){ container.innerHTML="<p>No news available.</p>"; return; }
-            container.innerHTML="";
-            data.reverse().forEach(item => {
-                const parsedDate = parseUgandaTimestamp(item.Timestamp);
-                const imageUrl = item.Filename;
-                const card = document.createElement("div");
-                card.className="news-card";
-                card.dataset.title=item.Title||"No Title";
-                card.dataset.description=item["Full Description"]||"";
-                card.dataset.image=imageUrl;
 
-                card.innerHTML=`
-                    <span class="category">${item.Category||"General"}</span>
-                    <img src="${imageUrl}" alt="${item.Title||"News"}">
-                    <h3>${item.Title||"No Title"}</h3>
-                    <p>${item.Headline||""}</p>
-                    <span class="time">${timeAgo(parsedDate)}</span>
-                `;
-                card.addEventListener("click",()=>openModal(card.dataset.title,card.dataset.description,card.dataset.image));
-                container.appendChild(card);
-            });
+            allNews = data.reverse(); // store reversed news
+            renderNews(allNews);
+            setupTabs(allNews);
+
         } catch(err) {
             console.error("Failed to load news:", err);
             container.innerHTML="<p>Error loading news.</p>";
         }
     }
-    loadNews();
 
-    // ---------------- Ads ----------------
-    const ads = [
-        { image: "screen.jfif", caption: "Screen replacement & repair – 0760638570", badge:"Electronics" },
-        { image: "rody.jpeg", caption: "Special Discount – 30% Off!", badge:"Entertainment" },
-        { image: "staurt.jpeg", caption: "New Tech Devices Available Now!", badge:"Electronics" },
-        { image: "sport.jpg", caption: "Join Our Sports Academy Today!", badge:"Sports" }
-    ];
+    // Render news cards
+    function renderNews(newsArray) {
+        container.innerHTML = "";
+        newsArray.forEach(item => {
+            const parsedDate = parseUgandaTimestamp(item.Timestamp);
+            const imageUrl = item.Filename;
 
-    const adTrack = document.getElementById("adTrack");
-    if(adTrack){
-        function createAd(ad){
-            const adItem = document.createElement("a");
-            adItem.href = ad.link||"#";
-            adItem.target="_blank";
-            adItem.className="ad-item";
-            adItem.innerHTML=`
-                <span class="ad-badge">${ad.badge}</span>
-                <img src="${ad.image}" loading="lazy">
-                <div class="ad-caption">${ad.caption}</div>
+            const card = document.createElement("div");
+            card.className="news-card";
+            card.dataset.category = item.Category || "General";
+            card.dataset.title = item.Title || "No Title";
+            card.dataset.description = item["Full Description"] || "";
+            card.dataset.image = imageUrl;
+
+            card.innerHTML=`
+                <span class="category">${item.Category||"General"}</span>
+                <img src="${imageUrl}" alt="${item.Title||"News"}">
+                <h3>${item.Title||"No Title"}</h3>
+                <p>${item.Headline||""}</p>
+                <span class="time">${timeAgo(parsedDate)}</span>
             `;
-            return adItem;
-        }
-        ads.forEach(ad=>adTrack.appendChild(createAd(ad)));
-        ads.forEach(ad=>adTrack.appendChild(createAd(ad)));
+            card.addEventListener("click",()=>openModal(card.dataset.title,card.dataset.description,card.dataset.image));
+            container.appendChild(card);
+        });
     }
+
+    // Setup tabs
+    function setupTabs(newsArray) {
+        if(!tabsContainer) return;
+        const categories = ["All", ...new Set(newsArray.map(n=>n.Category || "General"))];
+        tabsContainer.innerHTML = "";
+        categories.forEach(cat => {
+            const btn = document.createElement("button");
+            btn.textContent = cat;
+            btn.className = "tab-btn";
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+                if(cat==="All") renderNews(allNews);
+                else renderNews(allNews.filter(n => (n.Category||"General") === cat));
+            });
+            tabsContainer.appendChild(btn);
+        });
+        // Activate first tab by default
+        tabsContainer.querySelector("button").classList.add("active");
+    }
+
+    loadNews();
 });
