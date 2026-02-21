@@ -1,13 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
     const sheetURL = "https://opensheet.elk.sh/1hhE1DXSssZx58JdEpn6AXbroXcOiht0AcaDPlvvfe_U/news";
     const container = document.querySelector(".news-container");
-
     const hamburger = document.getElementById("hamburger");
     const navLinksContainer = document.getElementById("nav-links");
 
+    // ---------------- Hamburger ----------------
     if (hamburger && navLinksContainer) {
         hamburger.addEventListener("click", () => {
-            alert("clicked")
             navLinksContainer.classList.toggle("active");
             hamburger.classList.toggle("toggle");
         });
@@ -21,7 +20,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const [hours, minutes, seconds] = (timePart || "").split(":");
         return new Date(year, month - 1, day, hours || 0, minutes || 0, seconds || 0);
     }
-
 
     // ---------------- Modal ----------------
     const modal = document.getElementById("newsModal");
@@ -38,87 +36,62 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             modalImage.style.display = "none";
         }
-        modal.style.display = "block";
+        modal.style.display = "flex"; // make it flexible for mobile
     }
 
-    document.querySelector(".close").addEventListener("click", () => {
-        modal.style.display = "none";
-    });
+    document.querySelector(".close").addEventListener("click", () => modal.style.display = "none");
+    window.addEventListener("click", e => { if(e.target===modal) modal.style.display="none"; });
 
-    window.addEventListener("click", (e) => {
-        if (e.target === modal) modal.style.display = "none";
-    });
-
+    // ---------------- Time Ago ----------------
     function timeAgo(date) {
-    const now = new Date();
-    const seconds = Math.floor((now - date) / 1000);
-
-    if (seconds < 60) return `Posted ${seconds} seconds ago`;
-
-    const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `Posted ${minutes} ${minutes === 1 ? "minute" : "minutes"} ago`;
-
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `Posted ${hours} ${hours === 1 ? "hour" : "hours"} ago`;
-
-    const days = Math.floor(hours / 24);
-    if (days < 30) return `Posted ${days} ${days === 1 ? "day" : "days"} ago`;
-
-    const months = Math.floor(days / 30);
-    if (months < 12) return `Posted ${months} ${months === 1 ? "month" : "months"} ago`;
-
-    const years = Math.floor(months / 12);
-    return `Posted ${years} ${years === 1 ? "year" : "years"} ago`;
-}
+        const now = new Date();
+        const seconds = Math.floor((now - date) / 1000);
+        if (seconds < 60) return `Posted ${seconds} seconds ago`;
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `Posted ${minutes} ${minutes===1?"minute":"minutes"} ago`;
+        const hours = Math.floor(minutes/60);
+        if (hours < 24) return `Posted ${hours} ${hours===1?"hour":"hours"} ago`;
+        const days = Math.floor(hours/24);
+        if (days < 30) return `Posted ${days} ${days===1?"day":"days"} ago`;
+        const months = Math.floor(days/30);
+        if (months < 12) return `Posted ${months} ${months===1?"month":"months"} ago`;
+        const years = Math.floor(months/12);
+        return `Posted ${years} ${years===1?"year":"years"} ago`;
+    }
 
     // ---------------- Load News ----------------
     async function loadNews() {
-        const container = document.querySelector(".news-container");
-        if (!container) return console.error("No .news-container found");
-
+        if(!container) return console.error("No .news-container found");
         try {
             const response = await fetch(sheetURL);
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            if(!response.ok) throw new Error(`HTTP ${response.status}`);
             const data = await response.json();
-            if (!Array.isArray(data) || data.length === 0) {
-                container.innerHTML = "<p>No news available.</p>";
-                return;
-            }
-
-            container.innerHTML = "";
-
+            if(!Array.isArray(data) || data.length===0){ container.innerHTML="<p>No news available.</p>"; return; }
+            container.innerHTML="";
             data.reverse().forEach(item => {
                 const parsedDate = parseUgandaTimestamp(item.Timestamp);
-                const imageUrl = item["Filename"];
-
+                const imageUrl = item.Filename;
                 const card = document.createElement("div");
-                card.className = "news-card";
-                card.dataset.title = item.Title || "No Title";
-                card.dataset.description = item["Full Description"] || "";
-                card.dataset.image = imageUrl;
+                card.className="news-card";
+                card.dataset.title=item.Title||"No Title";
+                card.dataset.description=item["Full Description"]||"";
+                card.dataset.image=imageUrl;
 
-                card.innerHTML = `
-                    <span class="category">${item.Category || "General"}</span>
-                    <img src="${item.Filename}" alt="${item.Title || "News"}">
-                    <h3>${item.Title || "No Title"}</h3>
-                    <p>${item.Headline || ""}</p>
+                card.innerHTML=`
+                    <span class="category">${item.Category||"General"}</span>
+                    <img src="${imageUrl}" alt="${item.Title||"News"}">
+                    <h3>${item.Title||"No Title"}</h3>
+                    <p>${item.Headline||""}</p>
                     <span class="time">${timeAgo(parsedDate)}</span>
                 `;
-
-                // Event listener for modal
-                card.addEventListener("click", () => {
-                    openModal(card.dataset.title, card.dataset.description, card.dataset.image);
-                });
-
+                card.addEventListener("click",()=>openModal(card.dataset.title,card.dataset.description,card.dataset.image));
                 container.appendChild(card);
             });
-
-        } catch (err) {
+        } catch(err) {
             console.error("Failed to load news:", err);
-            container.innerHTML = "<p>Error loading news.</p>";
+            container.innerHTML="<p>Error loading news.</p>";
         }
     }
-
     loadNews();
 
     // ---------------- Ads ----------------
@@ -130,25 +103,20 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
 
     const adTrack = document.getElementById("adTrack");
-    if (adTrack) {
-
-    function createAd(ad) {
-        const adItem = document.createElement("a");
-        adItem.href = ad.link;
-        adItem.target = "_blank";
-        adItem.className = "ad-item";
-
-        adItem.innerHTML = `
-            <span class="ad-badge">${ad.badge}</span>
-            <img src="${ad.image}" loading="lazy">
-            <div class="ad-caption">${ad.caption}</div>
-        `;
-
-        return adItem;
+    if(adTrack){
+        function createAd(ad){
+            const adItem = document.createElement("a");
+            adItem.href = ad.link||"#";
+            adItem.target="_blank";
+            adItem.className="ad-item";
+            adItem.innerHTML=`
+                <span class="ad-badge">${ad.badge}</span>
+                <img src="${ad.image}" loading="lazy">
+                <div class="ad-caption">${ad.caption}</div>
+            `;
+            return adItem;
+        }
+        ads.forEach(ad=>adTrack.appendChild(createAd(ad)));
+        ads.forEach(ad=>adTrack.appendChild(createAd(ad)));
     }
-
-    // Add ads twice for seamless infinite scroll
-    ads.forEach(ad => adTrack.appendChild(createAd(ad)));
-    ads.forEach(ad => adTrack.appendChild(createAd(ad)));
-}
 });
