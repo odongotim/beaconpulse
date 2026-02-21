@@ -11,16 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return new Date(year, month - 1, day, hours || 0, minutes || 0, seconds || 0);
     }
 
-    // ---------------- Convert Drive Links ----------------
-    function convertDriveLink(url) {
-        if (!url) return "placeholder.jpg";
-        const idMatch =
-            url.match(/\/d\/([a-zA-Z0-9_-]+)/) ||
-            url.match(/id=([a-zA-Z0-9_-]+)/);
-        return idMatch
-            ? `https://drive.google.com/uc?export=view&id=${idMatch[1]}`
-            : url;
-    }
 
     // ---------------- Modal ----------------
     const modal = document.getElementById("newsModal");
@@ -82,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             data.reverse().forEach(item => {
                 const parsedDate = parseUgandaTimestamp(item.Timestamp);
-                const imageUrl = convertDriveLink(item.image_url);
+                const imageUrl = item.image_url;
 
                 const card = document.createElement("div");
                 card.className = "news-card";
