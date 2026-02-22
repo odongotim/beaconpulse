@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const navLinks = document.querySelectorAll(".nav-links li a");
     const searchInput = document.querySelector(".search-section input");
     const searchBtn = document.getElementById("searchBtn");
+    document.getElementById("year").textContent = new Date().getFullYear();
+    
 
     let allNews = [];
 
