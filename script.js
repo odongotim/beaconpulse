@@ -5,6 +5,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const hamburger = document.getElementById("hamburger");
     const navLinksContainer = document.getElementById("nav-links");
     const navLinks = document.querySelectorAll(".nav-links li a");
+    const searchInput = document.querySelector(".search-section input");
+    const searchBtn = document.getElementById("searchBtn");
 
     let allNews = [];
 
@@ -65,6 +67,34 @@ document.addEventListener("DOMContentLoaded", () => {
         const years = Math.floor(months / 12);
         return `Posted ${years} ${years === 1 ? "year" : "years"} ago`;
     }
+
+    function searchNews() {
+    const query = searchInput.value.trim().toLowerCase();
+    
+    if (!query) {
+        renderNews(allNews); // show all if search is empty
+        return;
+    }
+
+    const filtered = allNews.filter(item => {
+        const title = (item.Title || "").toLowerCase();
+        const headline = (item.Headline || "").toLowerCase();
+        const description = (item["Full Description"] || "").toLowerCase();
+        return title.includes(query) || headline.includes(query) || description.includes(query);
+    });
+
+    renderNews(filtered);
+}
+
+    // Search on button click
+if (searchBtn) {
+    searchBtn.addEventListener("click", searchNews);
+}
+
+// Optional: search as you type
+if (searchInput) {
+    searchInput.addEventListener("input", searchNews);
+}
 
     /* ===============================
        MODAL
