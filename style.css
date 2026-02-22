@@ -460,9 +460,10 @@ footer {
 }
 
 .ad-container {
-    width: 100%;
+    width: 95%;
     max-width: 900px;
     overflow: hidden;
+    border-radius: 5%;
 }
 
 .ad-track {
@@ -474,7 +475,7 @@ footer {
 
 .ad-item {
     min-width: 300px;
-    height: 220px;              /* Fixed card height */
+    height: auto;              /* Fixed card height */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -485,8 +486,8 @@ footer {
 }
 
 .ad-item img {
-    max-width: 100%;
-    max-height: 100%;
+    width: 300px;
+    height: 300px;
     object-fit: cover;        /* shows full image */
     display: block;
 }
@@ -502,6 +503,7 @@ footer {
     padding: 4px 8px;
     font-size: 12px;
     border-radius: 20px;
+    z-index: 10;
 }
 
 /* Caption */
@@ -570,4 +572,21 @@ footer {
 
 .hamburger.toggle span:nth-child(3) {
     transform: rotate(-45deg) translate(6px, -6px);
+}
+
+.watermark-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.watermark-text {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: bold;
+  pointer-events: none;
+  text-shadow: 1px 1px 3px black;
+  user-select: none;
 }

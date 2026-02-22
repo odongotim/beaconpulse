@@ -233,15 +233,16 @@ if (searchInput) {
 
     loadNews();
 
-
     /* ===============================
        ADS SLIDESHOW
     =============================== */
     const ads = [
-        { image: "screen.jfif", caption: "Screen replacement & repair – 0760638570", badge: "Electronics" },
-        { image: "rody.jpeg", caption: "Special Discount – 30% Off!", badge: "Entertainment" },
+        { image: "kids.jpeg", caption: "Kids Game dayout at RoseBank Hotel Lira(behind Vinatge Lounge) at only 5k", badge: "Kids" },
+        { image: "mogo.jpeg", caption: "Get a loan from 2m to 50m in just 24 hours! Pay back in a period of up to 24 months, with an interest rate of 2.5% reducing balance.", badge: "Loans" },
+        { image: "pentagon.jpeg", caption: "Pentagon restaurant and Cafteria has a whole line of your delicious meals at very pocket friendly prices.", badge: "Food" },
+        { image: "146.jpeg", caption: "Club 146 APAC presents the ultimate Sunday experience you’ve been waiting for! 💛", badge: "Vibes" },
         { image: "staurt.jpeg", caption: "New Tech Devices Available Now!", badge: "Electronics" },
-        { image: "sport.jpg", caption: "Join Our Sports Academy Today!", badge: "Sports" }
+        { image: "screen.jfif", caption: "Screen replacement & repair – 0760638570", badge: "Electronics" }   
     ];
 
     const adTrack = document.getElementById("adTrack");
@@ -270,3 +271,30 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/service-worker.js")
     .then(() => console.log("Service Worker Registered"));
 }
+
+function applyWatermark() {
+  document.querySelectorAll("img:not(.watermarked)").forEach(img => {
+
+    // Skip logos/icons if needed
+    if (img.classList.contains("logo-img")) return;
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "watermark-wrapper";
+
+    const watermark = document.createElement("span");
+    watermark.className = "watermark-text";
+    watermark.textContent = "BeaconPulse"; // 🔴 CHANGE THIS
+
+    img.classList.add("watermarked");
+
+    img.parentNode.insertBefore(wrapper, img);
+    wrapper.appendChild(img);
+    wrapper.appendChild(watermark);
+  });
+}
+
+// Run on page load
+document.addEventListener("DOMContentLoaded", applyWatermark);
+
+// Run again if content loads dynamically
+setInterval(applyWatermark, 1000);
