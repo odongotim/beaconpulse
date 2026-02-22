@@ -17,6 +17,12 @@
     z-index: 10000;
 }
 
+.logo-img {
+    width: 75px; /* adjust size as needed */
+    height: 75px;
+    object-fit: contain;
+}
+
 .nav-container {
     display: flex;
     justify-content: space-between;
