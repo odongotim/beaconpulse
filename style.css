@@ -554,3 +554,14 @@ footer {
     max-height: 70vh;
     overflow-y: auto;
 }
+.hamburger.toggle span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger.toggle span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.toggle span:nth-child(3) {
+    transform: rotate(-45deg) translate(6px, -6px);
+}
